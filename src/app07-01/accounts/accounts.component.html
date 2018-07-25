@@ -1,0 +1,91 @@
+<div>
+	<app-header (logOut)="logOut()"></app-header>
+	<div class="paddingBottom2">
+		<div *ngIf="messageShow">
+			<div class="col-sm-12 col-md-2 col-xl-4 pull-left"></div>
+			<div class="col-sm-12 col-md-8 col-xl-4 pull-left">
+				<div *ngIf="messageType === 'success'" class="alert alert-success textAlignCenter">{{messageValue}}</div>
+				<div *ngIf="messageType === 'error'" class="alert alert-danger textAlignCenter"><strong>UWAGA!</strong> {{messageValue}}</div>
+			</div>
+		</div>
+		<div class="col-sm-12 pull-left"></div>
+		<div class="col-sm-12 col-md-1 col-xl-2 pull-left"></div>
+		<div class="col-sm-12 col-md-9 col-xl-8 pull-left marginTop1 bgrContent borderRadius10">
+			<div class="col-sm-12 paddingTop2">
+				<h2>Manager rachunków Ad9BIS!</h2>
+			</div>
+			<div class="col-sm-12 pull-left">
+				<div class="col-sm-12 pull-left paddingTop2">
+					<div class="col-sm-12 col-xl-6 pull-left">
+						<div class="col-sm-12 pull-left paddingBottom2">
+							<h4>Wyszukiwanie zaawansowane</h4>
+						</div>
+						<div class="col-sm-12 col-xl-6 pull-left paddingBottom2 marginTop015">
+							<h4>Stan rachunku</h4>
+						</div>
+						<div class="col-sm-12 col-xl-6 pull-right paddingBottom2">
+							<select [(ngModel)]="currentState" (change)="checkAccounts()" [disabled]="children || inputDisabled" class="form-control">
+								<option *ngFor="let single of accountState" [ngValue]="single.id">{{single.name}}</option>
+							</select>
+						</div>
+						<div class="col-sm-12 pull-left"></div>
+						<div class="col-sm-12 col-xl-6 pull-left paddingBottom2 marginTop015">
+							<h4>Typ rachunku</h4>
+						</div>
+						<div class="col-sm-12 col-xl-6 pull-right paddingBottom2">
+							<select [(ngModel)]="currentType" (change)="checkAccounts()" [disabled]="children || inputDisabled" class="form-control"> 
+								<option *ngFor="let single of accountType" [ngValue]="single.id">{{single.name}}</option>
+							</select>
+						</div>
+						<div class="col-sm-12 pull-left"></div>
+						<div class="col-sm-12 col-xl-6 pull-left paddingBottom2 marginTop015">
+							<h4>Data od</h4>
+						</div>
+						<div class="col-sm-12 col-xl-6 pull-right paddingBottom2">
+							<div class="form-group">
+								<div class="input-group">
+									<input class="form-control" placeholder="Wciśnij guzik z prawej"
+										name="dp" [(ngModel)]="dateFrom" (ngModelChange)="checkAccounts()" [disabled]=true ngbDatepicker #first="ngbDatepicker">
+									<button class="input-group-addon" (click)="first.toggle()" type="button">
+										<img src="src/assets/date.png" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+									</button>
+								</div>
+							 </div>
+						</div>
+						<div class="col-sm-12 pull-left"></div>
+						<div class="col-sm-12 col-xl-6 pull-left paddingBottom2 marginTop015">
+							<h4>Data do</h4>
+						</div>
+						<div class="col-sm-12 col-xl-6 pull-right paddingBottom2">
+							<div class="form-group">
+								<div class="input-group">
+									<input class="form-control" placeholder="Wciśnij guzik z prawej"
+											name="dp" [(ngModel)]="dateTo" (ngModelChange)="checkAccounts()" [disabled]=true ngbDatepicker #second="ngbDatepicker">
+									<button class="input-group-addon" (click)="second.toggle()" type="button">
+										<img src="src/assets/date.png" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-12 col-xl-6 pull-right">
+						<div class="col-sm-12 pull-right paddingBottom2">
+							<h4 style="text-align: right">Zarządzanie rachunkami</h4>
+						</div>
+						<div class="col-sm-6 pull-left paddingBottom2"></div>
+						<div class="col-sm-4 pull-left paddingBottom2">	
+							<input type="button" value="Nowy rachunek" class="btn btn-primary" (click)="open('add')" />
+						</div>
+						<div class="col-sm-12 pull-left paddingBottom2"></div>
+						<div class="col-sm-6 pull-left paddingBottom2"></div>
+						<div class="col-sm-4 pull-left paddingBottom2">
+							<input type="button" value="Edytuj rachunek" class="btn btn-primary" [disabled]="selected === 0" (click)="open('update')" />
+						</div>
+						<div class="col-sm-4 pull-left paddingBottom2"></div>
+					</div>
+				</div>
+		</div>
+		<div class="col-sm-4 pull-left"></div>
+	</div>
+	<account-list [accountList]="list" [amount]="amount" [automatic]="automatic" [empty]="empty" [loading]="loading" [total]="totals" (setSelected)="handleSelected($event)" ></account-list>
+<div>

@@ -1,0 +1,73 @@
+<div>
+    <div class="col-sm-12 paddingTop2">
+		<h2>Manager rachunków Ad9BIS!</h2>
+	</div>
+	<div class="col-sm-12 pull-left">
+		<div class="col-sm-12 pull-left paddingTop2">
+			<div class="col-sm-12 col-lg-8 pull-left">
+				<div class="col-sm-12 pull-left paddingBottom2">
+					<h4>Wyszukiwanie zaawansowane</h4>
+				</div>
+				<div class="col-sm-12 col-lg-6 pull-left paddingBottom2 marginTop015">
+					<h4>Stan rachunku</h4>
+				</div>
+				<div class="col-sm-12 col-lg-6 pull-right paddingBottom2">
+					<select [(ngModel)]="currentState" (change)="checkAccounts()" [disabled]="children || inputDisabled" class="form-control">
+						<option *ngFor="let single of accountState" [ngValue]="single.id">{{single.name}}</option>
+					</select>
+				</div>
+				<div class="col-sm-12 pull-left"></div>
+				<div class="col-sm-12 col-lg-6 pull-left paddingBottom2 marginTop015">
+					<h4>Typ rachunku</h4>
+				</div>
+				<div class="col-sm-12 col-lg-6 pull-right paddingBottom2">
+					<select [(ngModel)]="currentType" (change)="checkAccounts()" [disabled]="children || inputDisabled" class="form-control"> 
+						<option *ngFor="let single of accountType" [ngValue]="single.id">{{single.name}}</option>
+					</select>
+				</div>
+				<div class="col-sm-12 pull-left"></div>
+				<div class="col-sm-12 col-lg-6 pull-left paddingBottom2 marginTop015">
+					<h4>Data od</h4>
+				</div>
+				<div class="col-sm-12 col-lg-6 pull-right paddingBottom2">
+					<div class="form-group">
+						<div class="input-group">
+							<input class="form-control" placeholder="Wciśnij guzik z prawej"
+								name="dp" [(ngModel)]="dateFrom" (ngModelChange)="checkAccounts()" [disabled]=true ngbDatepicker #first="ngbDatepicker">
+							<button class="input-group-addon" (click)="first.toggle()" type="button">
+								<img src="src/assets/date.png" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-12 pull-left"></div>
+				<div class="col-sm-12 col-lg-6 pull-left paddingBottom2 marginTop015">
+					<h4>Data do</h4>
+				</div>
+				<div class="col-sm-12 col-lg-6 pull-right paddingBottom2">
+					<div class="form-group">
+						<div class="input-group">
+							<input class="form-control" placeholder="Wciśnij guzik z prawej"
+								name="dp" [(ngModel)]="dateTo" (ngModelChange)="checkAccounts()" [disabled]=true ngbDatepicker #second="ngbDatepicker">
+							<button class="input-group-addon" (click)="second.toggle()" type="button">
+								<img src="src/assets/date.png" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-lg-4 pull-right">
+				<div class="col-sm-12">
+					<h4 style="text-align: left">Zarządzanie</h4>
+				</div>
+				<div class="col-sm-6 col-lg-12 pull-right" style="padding-top: 4%; padding-bottom: 4%;">
+					<input type="button" value="Nowy rachunek" class="btn btn-primary" (click)="open('add')" style="width: 100%;" />
+				</div>
+				<div class="col-sm-6 col-lg-12 pull-right" style="padding-top: 4%;">
+					<input type="button" value="Edytuj rachunek" class="btn btn-primary" [disabled]="selected === 0" (click)="open('update')" style="width: 100%;" />
+				</div>
+			</div>
+		</div>
+    </div>
+ </div>
+ 

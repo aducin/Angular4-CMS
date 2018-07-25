@@ -1,0 +1,19 @@
+<div>
+    <div class="col-sm-12 paddingBottom2 paddingTop2">
+		<h2>Manager kosztów Ad9BIS!</h2>
+	</div>
+	<div class="col-sm-12 pull-left">
+		<div *ngIf="amount" class="col-sm-12 pull-left paddingTop2">
+			<label class="col-sm-12 col-md-3 pull-left">Bieżąca kwota</label>
+			<div class="col-sm-12 col-md-3 pull-left">
+				<p>{{amount}} zł</p>
+			</div>
+			<div class="col-sm-12 col-md-3 pull-left paddingBottom2">
+				<button type="button" (click)="open('add')" class="btn btn-primary btn-block">Dodaj</button>
+			</div>
+			<div class="col-sm-12 col-md-3 pull-left paddingBottom2">
+				<button type="button" (click)="open('subtract')" class="btn btn-primary btn-block">Odejmij</button>
+			</div>
+		</div>
+	</div>
+</div>

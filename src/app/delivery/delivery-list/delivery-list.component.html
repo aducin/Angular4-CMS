@@ -1,0 +1,125 @@
+<div *ngIf="deliveryList" class="paddingTop10">
+    <div class="col-sm-12 pull-left bgrContent borderRadius10 marginTop4 marginBottom30 paddingTop20px paddingBottom20px">
+        <div *ngIf="loading">
+			<h3>{{ loadingMessage }}</h3>
+			<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '8px'}"></ngx-loading>
+		</div>
+        <div *ngIf="empty">
+              <div class="col-sm-12 pull-left textAlignCenter">
+                  <h3>Brak dokumentów spełniających określone kryteria</h3>
+              </div>
+          </div>
+          <div *ngIf="!empty">
+              <div class="col-sm-12 pull-left textAlignCenter paddingBottom20px">
+                  <h3 *ngIf="automatic">Lista przyjęć - ostatnie {{amount}} wyników</h3>
+                  <h3 *ngIf="!automatic">Lista przyjęć z wybranego zakresu - {{amount}} {{amountSuffix}}</h3>
+              </div>
+              <div class="paddingBottom20px">
+                  <table class="table table-bordered table-horizontal">
+                      <thead>
+                          <th (click)="reSort('number')" class="textAlignCenter" cursorPointer>Numer
+                              <i *ngIf="sortBy==='number' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy==='number' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy!=='number'" class="fa fa-sort" aria-hidden="true"></i>
+                          </th>
+                          <th (click)="reSort('name')" class="textAlignCenter" cursorPointer>Nazwa
+                              <i *ngIf="sortBy==='name' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy==='name' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy!=='name'" class="fa fa-sort" aria-hidden="true"></i>
+                          </th>
+                          <th (click)="reSort('documentDateStamp')" class="textAlignCenter" cursorPointer>Data
+                              <i *ngIf="sortBy==='documentDateStamp' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy==='documentDateStamp' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy!=='documentDateStamp'" class="fa fa-sort" aria-hidden="true"></i>
+                          </th>
+                          <th class="textAlignCenter" cursorPointer>Przyjęcie (.pdf)</th>
+                          <th class="textAlignCenter" cursorPointer>Wpłata (.pdf)</th>
+                          <th class="textAlignCenter" cursorPointer>Aukcja (.pdf)</th>
+                          <th (click)="reSort('locs')" class="textAlignCenter" cursorPointer>Lok.
+                              <i *ngIf="sortBy==='locs' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy==='locs' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy!=='locs'" class="fa fa-sort" aria-hidden="true"></i>
+                          </th>
+                          <th (click)="reSort('coaches')" class="textAlignCenter" cursorPointer>Wagony
+                              <i *ngIf="sortBy==='coaches' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy==='coaches' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy!=='coaches'" class="fa fa-sort" aria-hidden="true"></i>
+                          </th>
+                          <th (click)="reSort('elements')" class="textAlignCenter" cursorPointer>Elementy
+                              <i *ngIf="sortBy==='elements' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy==='elements' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy!=='elements'" class="fa fa-sort" aria-hidden="true"></i>
+                          </th>
+                          <th (click)="reSort('accessories')" class="textAlignCenter" cursorPointer>Części
+                              <i *ngIf="sortBy==='accessories' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy==='accessories' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy!=='accessories'" class="fa fa-sort" aria-hidden="true"></i>
+                          </th>
+                          <th (click)="reSort('books')" class="textAlignCenter" cursorPointer>Książki
+                              <i *ngIf="sortBy==='s' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy==='books' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy!=='books'" class="fa fa-sort" aria-hidden="true"></i>
+                          </th>
+                          <th (click)="reSort('cars')" class="textAlignCenter" cursorPointer>Auta
+                              <i *ngIf="sortBy==='cars' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy==='cars' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                              <i *ngIf="sortBy!=='cars'" class="fa fa-sort" aria-hidden="true"></i>
+                          </th>
+                          <th class="textAlignCenter" cursorPointer>Akcja</th>
+                      </thead>
+                      <tbody>
+                          <tr *ngFor="let item of deliveryList | orderBy: sortBy: sortReverse, let i = index" [class.activeRow]="item.id === selected" (click)="setActive(item.id)">
+                             <td [ngClass]="{'colorAlertDanger': item.toPrint === 1, 'colorAlertSuccess': item.toPrint === 2}" class="textAlignCenter paddingTop20px">{{item.number}}</td>
+                            <td [ngClass]="{'colorAlertDanger': item.toPrint === 1, 'colorAlertSuccess': item.toPrint === 2}" class="textAlignCenter paddingTop20px">{{item.name}}</td>
+                            <td class="textAlignCenter">{{item.documentDate}}</td>
+                            <td class="textAlignCenter">
+                                <a *ngIf="item.deliveryFile" href="{{url}}files/delivery/1/{{item.id}}/{{item.deliveryFile}}" target="_blank">{{item.deliveryFile}}</a>
+                                <span *ngIf="!item.deliveryFile"><i>Brak</i></span>
+                            </td>
+                            <td class="textAlignCenter">
+                                <a *ngIf="item.type === 1 && item.paymentFile" href="{{url}}files/delivery/2/{{item.id}}/{{item.paymentFile}}" target="_blank">{{item.paymentFile}}</a>
+                                <span *ngIf="item.type === 1 && !item.paymentFile"><i>Brak</i></span>
+                            </td>
+                            <td class="textAlignCenter">
+                                <a *ngIf="item.type === 1 && item.auctionFile" href="{{url}}files/delivery/3/{{item.id}}/{{item.auctionFile}}" target="_blank">{{item.auctionFile}}</a>
+                                <span *ngIf="item.type === 1 && !item.auctionFile"><i>Brak</i></span>
+                            </td>
+                            <td class="textAlignCenter"><span *ngIf="item.locs">{{item.locs}}</span><span *ngIf="!item.locs">0</span></td>
+                            <td class="textAlignCenter"><span *ngIf="item.coaches">{{item.coaches}}</span><span *ngIf="!item.coaches">0</span></td>
+                            <td class="textAlignCenter"><span *ngIf="item.elements">{{item.elements}}</span><span *ngIf="!item.elements">0</span></td>
+                            <td class="textAlignCenter"><span *ngIf="item.accessories">{{item.accessories}}</span><span *ngIf="!item.accessories">0</span></td>
+                            <td class="textAlignCenter"><span *ngIf="item.books">{{item.books}}</span><span *ngIf="!item.books">0</span></td>
+                            <td class="textAlignCenter"><span *ngIf="item.cars">{{item.cars}}</span><span *ngIf="!item.cars">0</span></td>
+                            <td>
+                                <div class="col-sm-4 pull-left">
+                                    <ng4-files-click *ngIf="!item.deliveryFile" (filesSelect)="filesUpload($event, item.id, 1)">
+                                        <span class="btn cursorPointer" ngbTooltip="Dodaj przyjęcie"><i class="fa fa-print" aria-hidden="true"></i></span>
+                                    </ng4-files-click>
+                                    <ng4-files-click *ngIf="item.deliveryFile" (filesSelect)="filesUpload($event, item.id, 1)">
+                                        <span class="btn cursorPointer" ngbTooltip="Zmień przyjęcie"><i class="fa fa-print" aria-hidden="true"></i></span>
+                                    </ng4-files-click>
+                                </div>
+                                <div class="col-sm-4 pull-left">
+                                    <ng4-files-click *ngIf="item.type === 1 && !item.paymentFile" (filesSelect)="filesUpload($event, item.id, 2)">
+                                        <span class="btn cursorPointer" ngbTooltip="Dodaj wpłatę"><i class="fa fa-print" aria-hidden="true"></i></span>
+                                    </ng4-files-click>
+                                    <ng4-files-click *ngIf="item.type === 1 && item.paymentFile" (filesSelect)="filesUpload($event, item.id, 2)">
+                                        <span class="btn cursorPointer" ngbTooltip="Zmień wpłatę"><i class="fa fa-print" aria-hidden="true"></i></span>
+                                    </ng4-files-click>
+                                </div>
+                                <div class="col-sm-4 pull-left">
+                                    <ng4-files-click *ngIf="item.type === 1 && !item.auctionFile" (filesSelect)="filesUpload($event, item.id, 3)">
+                                        <span class="btn cursorPointer" ngbTooltip="Dodaj aukcję"><i class="fa fa-print" aria-hidden="true"></i></span>
+                                    </ng4-files-click>
+                                    <ng4-files-click *ngIf="item.type === 1 && item.auctionFile" (filesSelect)="filesUpload($event, item.id, 3)">
+                                        <span class="btn cursorPointer" ngbTooltip="Zmień aukcję"><i class="fa fa-print" aria-hidden="true"></i></span>
+                                    </ng4-files-click>
+                                </div>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+  </div>

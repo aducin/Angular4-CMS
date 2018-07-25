@@ -1,0 +1,26 @@
+<div>
+	<app-header 
+		(logOut)="logOut()"
+		[name]="self">
+	</app-header>
+	<div class="paddingBottom2">
+		<app-message
+			[messageShow]="messageShow"
+			[messageType]="messageType"
+			[messageValue]="messageValue">
+		</app-message>
+		<div class="col-sm-12 pull-left"></div>
+		<div class="col-sm-12 col-md-1 col-xl-2 pull-left"></div>
+		<div class="col-sm-12 col-md-9 col-xl-8 pull-left marginTop1 bgrContent borderRadius10">
+			<postal-header
+				[amount]="amount"
+				(openModal)="open($event)">
+			</postal-header>
+		</div>
+		<div class="col-sm-4 pull-left"></div>
+	</div>
+	<postal-list 
+		[postalList]="list" 
+		[loading]="loading" 
+	></postal-list>
+<div>

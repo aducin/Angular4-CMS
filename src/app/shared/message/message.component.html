@@ -1,0 +1,7 @@
+<div *ngIf="messageShow" class="marginTop4">
+	<div class="col-sm-12 col-md-2 col-xl-4 pull-left"></div>
+	<div class="col-sm-12 col-md-8 col-xl-4 pull-left">
+		<div *ngIf="messageType === 'success'" class="alert alert-success textAlignCenter">{{messageValue}}</div>
+		<div *ngIf="messageType === 'error'" class="alert alert-danger textAlignCenter"><strong>UWAGA</strong> {{messageValue}}</div>
+	</div>
+</div>

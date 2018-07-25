@@ -1,0 +1,28 @@
+<div *ngIf="postalList" class="paddingTop10">
+	<div class="col-sm-12 pull-left"></div>
+	<div class="col-sm-12 col-md-1 col-xl-2 pull-left"></div>
+	<div class="col-sm-12 col-md-9 col-xl-8 pull-left bgrContent borderRadius10 marginTop4 marginBottom30 paddingTop20px paddingBottom20px">
+		<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
+		<div class="col-sm-2 pull-left">
+			<h4>Lp.</h4>
+		</div>
+		<div class="col-sm-5 pull-left textAlignCenter">
+			<h4>Kwota</h4>
+		</div>
+		<div class="col-sm-5 pull-left textAlignCenter">
+			<h4>Data</h4>
+		</div>
+		<div *ngFor="let item of postalList">
+			<div class="col-sm-2 pull-left paddingTop1">
+				<label>{{item.number}}.</label>
+			</div>
+			<div class="col-sm-5 pull-left textAlignCenter paddingTop1">
+				<label>{{item.current}}zł</label>
+			</div>
+			<div class="col-sm-5 pull-left textAlignCenter paddingTop1">
+				<label>{{item.date}}</label>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-12 col-md-1 col-xl-2 pull-left"></div>
+</div>

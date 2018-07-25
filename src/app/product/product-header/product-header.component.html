@@ -1,0 +1,67 @@
+<div>
+    <div class="col-sm-12 paddingTop10px">
+		<h2>Manager produktów</h2>
+	</div>
+	<div class="col-sm-12 pull-left">
+		<div *ngIf="category && manufactorer" class="col-sm-12 pull-left paddingTop2">
+			<div class="col-sm-12 col-lg-7 pull-left">
+				<div class="col-sm-12 pull-left paddingBottom2">
+					<h4>Wyszukiwanie po nazwie</h4>
+				</div>
+				<div class="col-sm-12 col-lg-4 pull-left paddingBottom2 marginTop015">
+					<h4>Kategoria</h4>
+				</div>
+				<div class="col-sm-12 col-lg-8 pull-right paddingBottom2">
+					<select [(ngModel)]="currentCategory" (change)="namePrepare()" [disabled]="children || inputDisabled" class="form-control">
+						<option *ngFor="let single of category" [ngValue]="single.id">{{single.metaTitle}}</option>
+					</select>
+				</div>
+				<div class="col-sm-12 pull-left"></div>
+				<div class="col-sm-12 col-lg-4 pull-left paddingBottom2 marginTop015">
+					<h4>Producent</h4>
+				</div>
+				<div class="col-sm-12 col-lg-8 pull-right paddingBottom2">
+					<select [(ngModel)]="currentManufactorer" (change)="namePrepare()" [disabled]="children || inputDisabled" class="form-control"> 
+						<option *ngFor="let single of manufactorer" [ngValue]="single.id">{{single.name}}</option>
+					</select>
+				</div>
+				<div class="col-sm-12 pull-left"></div>
+				<div class="col-sm-12 col-lg-4 pull-left paddingBottom2 marginTop015">
+					<h4>Nazwa</h4>
+				</div>
+				<div class="col-sm-12 col-lg-8 pull-right paddingBottom2">
+					<input 
+                        (keyup)="namePrepare()" 
+                        [(ngModel)]="currentName" 
+                        #name="ngModel" 
+                        [disabled]="children || inputDisabled" 
+                        id="name" 
+                        name="name" 
+                        minlength="4" 
+                        class="form-control textAlignCenter" 
+                        placeholder="Podaj nazwę" 
+                    />
+					<div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger textAlignCenter marginTop3">
+						<div *ngIf="name.errors.minlength">Wpisz min. 4 znaki!</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-lg-5 pull-right">
+				<div class="col-sm-12 pull-right paddingBottom2">
+					<h4 style="text-align: left">Wyszukiwanie po ID</h4>
+				</div>
+				<div class="col-sm-12 col-lg-8 pull-right paddingBottom2">
+					<input 
+                        (keyup)="idSearch()" 
+                        [(ngModel)]="currentId" 
+                        [disabled]="children || inputDisabled" 
+                        id="id" 
+                        class="form-control textAlignCenter" 
+                        placeholder="Podaj numer ID" 
+                    />
+					<div *ngIf="error.id" class="alert alert-danger textAlignCenter marginTop3">Podaj liczbę, Łośku!</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

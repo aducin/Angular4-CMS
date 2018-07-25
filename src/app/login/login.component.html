@@ -1,0 +1,21 @@
+<div class="containerMain width100">
+	<!--<div user-authorisation></div>-->
+	<div class="col-xs-12 col-md-3 pull-left">
+	</div>
+	<div class="col-xs-12 col-md-6 pull-left">
+		<!--<div action-message></div>-->
+	</div>
+	<div class="marginTop15">  
+		<div class="form-signin">    
+			<h2 class="form-signin-heading">Panel CMS</h2>
+			<div *ngIf="loggedIn" class="alert alert-success centered">{{result}}</div>
+			<div *ngIf="loggedError" class="alert alert-danger centered">{{result}}</div>
+			<input type="text" [(ngModel)]="login" (keyup)="handleData()" [disabled]="disabledFields" class="form-control textAlignCenter" placeholder="Podaj login" />
+			<input type="password" [(ngModel)]="password" (keyup)="handleData()" [disabled]="disabledFields" class="form-control textAlignCenter" placeholder="Podaj hasło" />      
+			<label class="checkbox">
+				<input type="checkbox" [(ngModel)]="remember" [disabled]="disabledFields" style="margin-top: 6px;"><span style="margin-left: 8px;">Pozostań zalogowany</span>
+			</label>
+			<button (click)="logIn()" [disabled]="disabledFields" class="btn btn-lg btn-primary btn-block" type="submit">Zaloguj</button>  
+		</div> 
+	</div>
+</div>

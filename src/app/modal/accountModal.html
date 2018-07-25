@@ -1,0 +1,138 @@
+<div class="modal-header">
+    <div *ngIf="!data.error && !data.success" class="col-sm-12 pull-left">
+        <h4 class="modal-title">{{data.title}}</h4>
+    </div>
+    <div *ngIf="data.error" class="col-sm-12 pull-left">
+        <div class="alert alert-danger textAlignCenter">{{data.message}}</div>
+    </div>
+    <div *ngIf="data.success" class="col-sm-12 pull-left">
+        <div class="alert alert-success textAlignCenter">{{data.message}}</div>
+    </div>
+    <div class="col-sm-12 pull-left">
+        <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</div>
+<div class="modal-body">
+    <div class="col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Status rachunku:</label>
+    </div>
+    <div class="col-sm-8 pull-left marginBottom05">
+        <select (change)="removeChoose('closed')" [(ngModel)]="data.obj.closed" [disabled]="disableInput" class="form-control">
+            <option *ngFor="let single of data.state" [ngValue]="single.id">{{single.name}}</option>
+        </select>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Typ rachunku:</label>
+    </div>
+    <div class="marginTop2 col-sm-8 pull-left marginBottom05">
+        <select (change)="removeChoose('type')" [(ngModel)]="data.obj.type" [disabled]="disableInput" class="form-control">
+            <option *ngFor="let single of data.type" [ngValue]="single.id">{{single.name}}</option>
+        </select>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Klient:</label>
+    </div>
+    <div class="marginTop2 col-sm-8 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.recipient" (ngModelChange)="checkAmount()" [disabled]="disableInput" class="form-control" placeholder="Podaj nazwę" />
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Adres:</label>
+    </div>
+    <div class="marginTop2 col-sm-8 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.address" (ngModelChange)="checkAmount()" [disabled]="disableInput" class="form-control" placeholder="Podaj adres" />
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Kwota:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.amount" (ngModelChange)="checkAmount()" [disabled]="disableInput" class="form-control textAlignCenter" placeholder="Podaj kwotę" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div class="marginTop1 col-sm-4 pull-left">
+        <label class="marginTop5px">Data wpłaty:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left">
+        <div class="form-group">
+            <div class="input-group">
+                <input class="form-control textAlignCenter" placeholder="Wciśnij guzik z prawej"
+                       name="dp" [(ngModel)]="data.cashTime" (ngModelChange)="checkAmount()" [disabled]=true ngbDatepicker #cash="ngbDatepicker">
+                <button class="input-group-addon" (click)="cash.toggle()" type="button">
+                    <img src="src/assets/date.png" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div class="col-sm-4 pull-left">
+        <label class="marginTop5px">Data dokumentu:</label>
+    </div>
+    <div class="col-sm-4 pull-left">
+        <div class="form-group">
+            <div class="input-group">
+                <input class="form-control textAlignCenter" placeholder="Wciśnij guzik z prawej"
+                       name="dp" [(ngModel)]="data.receiptTime" (ngModelChange)="checkAmount()" [disabled]=true ngbDatepicker #receipt="ngbDatepicker">
+                <button class="input-group-addon" (click)="receipt.toggle()" type="button">
+                    <img src="src/assets/date.png" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div class="col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Numer dokumentu:</label>
+    </div>
+    <div class="col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.receipt" (ngModelChange)="checkAmount()" [disabled]="disableInput" class="form-control textAlignCenter" placeholder="Podaj numer" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Lokomotywy:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.locs" (ngModelChange)="checkAmount()" [disabled]="disableInput" class="form-control textAlignCenter" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Wagony:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.coach" (ngModelChange)="checkAmount()" [disabled]="disableInput" class="form-control textAlignCenter" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Elementy makiety:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.element" (ngModelChange)="checkAmount()" [disabled]="disableInput" class="form-control textAlignCenter" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Części zamienne:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.accessories" (ngModelChange)="checkAmount()" [disabled]="disableInput" class="form-control textAlignCenter" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Literatura:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.book" (ngModelChange)="checkAmount()" [disabled]="disableInput" class="form-control textAlignCenter" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom25">
+        <label class="marginTop5px">Auta:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom25">
+        <input [(ngModel)]="data.obj.car" (ngModelChange)="checkAmount()" [disabled]="disableInput" class="form-control textAlignCenter" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+</div>
+<div class="modal-footer">
+    <div class="col-sm-12 float-sm-right">
+        <input type="button" value="Zapisz" class="btn btn-primary" [disabled]="!data.saveAllow" (click)="save()" />
+        <input type="button" value="Zamknij" class="btn btn-danger" (click)="activeModal.close(false)" />
+    </div>
+</div> 

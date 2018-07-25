@@ -1,0 +1,85 @@
+<div>
+  <div class="col-sm-12 pull-left"></div>
+  <div class="col-sm-12 col-lg-2 pull-left"></div>
+  <div class="col-sm-12 col-lg-8 pull-left bgrContent borderRadius10 marginTop2 paddingTop20px">
+    <div *ngIf="newestSearch" class="col-sm-12 pull-left textAlignCenter">
+      <h3>Proszę czekać - wyszukiwanie nowych zamówień...</h3>
+      <ngx-loading [show]="newestSearch" [config]="{ backdropBorderRadius: '8px'}"></ngx-loading>
+    </div>
+    <div *ngIf="!newestSearch && listNew === undefined && listOld === undefined" class="col-sm-12 pull-left">
+      <h3>Brak nowych zamówień w obu panelach.</h3>
+    </div>
+    <div *ngIf="!newestSearch && (listNew !== null || listOld === null)" class="col-sm-12 pull-left paddingBottom20px">
+      <div *ngIf="listNew !== undefined && listNew !== null">
+        <div class="paddingBottom10px">
+          <h3 *ngIf="listNew.length === 1">Nowe zamówienie (nowy panel):
+            <i (click)="delete('new', newest.new)" class="fa fa-trash-o cursorPointer" aria-hidden="true"
+               style="margin-left: 100px"></i>
+          </h3>
+          <h3 *ngIf="listNew.length > 1">Nowe zamówienia (nowy panel):
+            <i (click)="delete('new', newest.new)" class="fa fa-trash-o cursorPointer" aria-hidden="true"
+               style="margin-left: 100px"></i>
+          </h3>
+        </div>
+        <table class="table table-striped table-bordered" style="width:100%;">
+          <thead>
+          <th class="textAlignCenter">ID</th>
+          <th class="textAlignCenter">Data</th>
+          <th class="textAlignCenter">Symbol</th>
+          <th class="textAlignCenter">Kwota</th>
+          <th class="textAlignCenter">Porto</th>
+          <th class="textAlignCenter">Akcja</th>
+          </thead>
+          <tbody>
+          <tr *ngFor="let item of listNew" class="textAlignCenter">
+            <td>{{ item.id }}</td>
+            <td>{{ item.dateAdd }}</td>
+            <td>{{ item.reference }}</td>
+            <td>{{ item.totalProduct }} zł</td>
+            <td>{{ item.totalShipping }} zł</td>
+            <td>
+              <a href="#/orders/new/{{ item.id }}" target="blank">Edycja</a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="listOld !== undefined && listOld !== null">
+        <div class="paddingBottom10px">
+          <h3 *ngIf="listOld.length === 1">Nowe zamówienie (stary panel):
+            <i (click)="delete('old', newest.old)" class="fa fa-trash-o cursorPointer" aria-hidden="true"
+               style="margin-left: 100px"></i>
+          </h3>
+          <h3 *ngIf="listOld.length > 1">Nowe zamówienia (stary panel):
+            <i (click)="delete('old', newest.old)" class="fa fa-trash-o cursorPointer" aria-hidden="true"
+               style="margin-left: 100px"></i>
+          </h3>
+        </div>
+        <table class="table table-striped table-bordered" style="width:100%;">
+          <thead>
+          <th class="textAlignCenter">ID</th>
+          <th class="textAlignCenter">Data</th>
+          <th class="textAlignCenter">Symbol</th>
+          <th class="textAlignCenter">Kwota</th>
+          <th class="textAlignCenter">Porto</th>
+          <th class="textAlignCenter">Akcja</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of listOld" class="textAlignCenter">
+              <td>{{ item.id }}</td>
+              <td>{{ item.dateAdd }}</td>
+              <td>{{ item.reference }}</td>
+              <td>{{ item.totalProduct }} zł</td>
+              <td>{{ item.totalShipping }} zł</td>
+              <td>
+                <a href="#/orders/old/{{ item.id }}" target="blank">Edycja</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+   </div>
+  </div>
+

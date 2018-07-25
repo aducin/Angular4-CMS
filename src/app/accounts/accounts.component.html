@@ -1,0 +1,36 @@
+<div>
+	<app-header 
+	(logOut)="logOut()"
+	[name]="self"
+	></app-header>
+	<div class="paddingBottom2">
+		<div *ngIf="messageShow">
+			<div class="col-sm-12 col-md-2 col-xl-4 pull-left"></div>
+			<div class="col-sm-12 col-md-8 col-xl-4 pull-left">
+				<div *ngIf="messageType === 'success'" class="alert alert-success textAlignCenter">{{messageValue}}</div>
+				<div *ngIf="messageType === 'error'" class="alert alert-danger textAlignCenter"><strong>UWAGA!</strong> {{messageValue}}</div>
+			</div>
+		</div>
+		<div class="col-sm-12 pull-left"></div>
+		<div class="col-sm-12 col-md-1 col-xl-2 pull-left"></div>
+		<div class="col-sm-12 col-md-9 col-xl-8 pull-left marginTop1 bgrContent borderRadius10">
+			<account-header
+			(check)="checkAccounts($event)"
+			[loading]="loading"
+			[refresh]="refresh"
+			(openModal)="open($event)"
+			>
+			</account-header>
+		</div>
+		<div class="col-sm-4 pull-left"></div>
+	</div>
+	<account-list 
+		[accountList]="list" 
+		[amount]="amount" 
+		[automatic]="automatic" 
+		[empty]="empty" 
+		[loading]="loading" 
+		[total]="totals" 
+		(setSelected)="handleSelected($event)" 
+	></account-list>
+<div>

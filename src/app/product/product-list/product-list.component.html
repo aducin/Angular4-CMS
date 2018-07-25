@@ -1,0 +1,61 @@
+<div>
+	<div class="col-sm-12 pull-left"></div>
+	<div class="col-sm-12 col-lg-2 pull-left"></div>
+	<div class="col-sm-12 col-lg-8 pull-left bgrContent borderRadius10 marginTop4 paddingTop20px paddingBottom20px">
+		<div *ngIf="searchInProgress">
+			<h3>Trwa wyszukiwanie - proszę czekać...</h3>
+			<ngx-loading [show]="searchInProgress" [config]="{ backdropBorderRadius: '8px'}"></ngx-loading>
+		</div>
+		<div *ngIf="!searchInProgress">
+		<div *ngIf="emptySearch">
+			<div class="col-sm-12 pull-left textAlignCenter paddingBottom20px">
+				<h3>Nie znaleziono produktów spełniających określone kryteria.</h3>
+			</div>
+		</div>
+		<div *ngIf="!emptySearch">
+			<div class="col-sm-12 pull-left textAlignCenter paddingBottom20px">
+				<h3>Lista wyników: ({{listLength}} szt.)</h3>
+			</div>
+			<div class="col-sm-2 pull-left textAlignCenter">
+				<h4>Miniatura</h4>
+			</div>
+			<div class="col-sm-1 pull-left">
+				<h4>ID.</h4>
+			</div>
+			<div class="col-sm-5 pull-left">
+				<h4>Nazwa</h4>
+			</div>
+			<div class="col-sm-2 pull-left textAlignCenter">
+				<h4>Ilość</h4>
+			</div>
+			<div class="col-sm-2 pull-left textAlignCenter">
+				<h4>Akcje</h4>
+			</div>
+			<div *ngFor="let item of productList">
+				<div class="col-sm-12 col-lg-2 pull-left paddingTop1 textAlignCenter">
+					<img [src]="item.imgPath" height="100" width="100">
+				</div>
+				<div class="col-sm-2 col-lg-1 pull-left paddingTop1">
+					<label class="marginTop35px">{{item.id}}</label>
+				</div>
+				<div class="col-sm-6 col-lg-5 pull-left paddingTop1">
+					<label class="marginTop35px"><a href="{{url}}{{item.id}}-{{item.link_rewrite}}.html" target="blank">{{item.name}}</a></label>
+				</div>
+				<div class="col-sm-2 col-lg-2 pull-left paddingTop1 textAlignCenter">
+					<label class="marginTop35px">{{item.quantity}}</label>
+				</div>
+				<div class="col-sm-2 col-lg-2 pull-left paddingTop1 textAlignCenter">
+					<label style="margin-top: 30px;">
+						<i (click)="open(item.id)" class="fa fa-object-ungroup" aria-hidden="true" placement="left" ngbTooltip="Szybka edycja"></i>
+						<i (click)="displayEdition(item.id)" class="fa fa-bars" aria-hidden="true" style="margin-left: 5px;" placement="right" ngbTooltip="Pełna edycja"></i>
+					</label>
+				</div>
+				<div class="col-sm-12 pull-left"></div>
+			</div>
+			<div class="col-sm-2 pull-right paddingBottom20px">
+				<button type="button" (click)="clearList()" class="btn btn-danger btn-block">Usuń wyniki</button>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-12 col-lg-2 pull-left"></div>
+</div>

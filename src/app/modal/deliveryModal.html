@@ -1,0 +1,110 @@
+<div class="modal-header">
+    <div *ngIf="!errorDisplay && !success" class="col-sm-12 pull-left">
+        <h4 class="modal-title">{{data.title}}</h4>
+    </div>
+    <div *ngIf="errorDisplay" class="col-sm-12 pull-left">
+        <div class="alert alert-danger textAlignCenter">{{message}}</div>
+    </div>
+    <div *ngIf="success" class="col-sm-12 pull-left">
+        <div class="alert alert-success textAlignCenter">{{message}}</div>
+    </div>
+    <div class="col-sm-12 pull-left">
+        <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</div>
+<div class="modal-body">
+    <div class="col-sm-4 pull-left marginBottom12">
+        <label class="marginTop5px">Stan:</label>
+    </div>
+    <div class="col-sm-8 pull-left marginBottom12">
+        <select (change)="removeChoose('status')" [(ngModel)]="data.obj.toPrint" [disabled]="disableInput" class="form-control">
+            <option *ngFor="let single of data.status" [ngValue]="single.id">{{single.name}}</option>
+        </select>
+    </div>
+    <div class="col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Typ przyjęcia:</label>
+    </div>
+    <div class="col-sm-8 pull-left marginBottom05">
+        <select (change)="removeChoose('types')" [(ngModel)]="data.obj.type" [disabled]="disableInput" class="form-control">
+            <option *ngFor="let single of data.types" [ngValue]="single.id">{{single.name}}</option>
+        </select>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Numer:</label>
+    </div>
+    <div class="marginTop2 col-sm-8 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.number" (ngModelChange)="check()" [disabled]="disableInput" class="form-control" placeholder="Podaj nazwę" />
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Nazwa:</label>
+    </div>
+    <div class="marginTop2 col-sm-8 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.name" (ngModelChange)="check()" [disabled]="disableInput" class="form-control" placeholder="Podaj nazwę" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div class="marginTop1 col-sm-4 pull-left">
+        <label class="marginTop5px">Data przyjęcia:</label>
+    </div>
+    <div class="marginTop2 col-sm-7 pull-left">
+        <div class="form-group">
+            <div class="input-group">
+                <input class="form-control textAlignCenter" placeholder="Wciśnij guzik z prawej"
+                       name="dp" [(ngModel)]="data.dateTime" (ngModelChange)="check()" [disabled]=true ngbDatepicker #document="ngbDatepicker">
+                <button class="input-group-addon" (click)="document.toggle()" type="button">
+                    <img src="src/assets/date.png" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div [ngClass]="{'colorAlertDanger': error.locs}" class="col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Lokomotywy:</label>
+    </div>
+    <div class="col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.locs" (ngModelChange)="check()" [disabled]="disableInput" [ngClass]="{'colorAlertDanger': error.locs}" class="form-control" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div [ngClass]="{'colorAlertDanger': error.coaches}" class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Wagony:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.coaches" (ngModelChange)="check()" [disabled]="disableInput" [ngClass]="{'colorAlertDanger': error.coaches}" class="form-control" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div [ngClass]="{'colorAlertDanger': error.elements}" class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Elementy:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.elements" (ngModelChange)="check()" [disabled]="disableInput" [ngClass]="{'colorAlertDanger': error.elements}" class="form-control" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div [ngClass]="{'colorAlertDanger': error.accessories}" class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Akcesoria:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.accessories" (ngModelChange)="check()" [disabled]="disableInput" [ngClass]="{'colorAlertDanger': error.accessories}" class="form-control" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div [ngClass]="{'colorAlertDanger': error.books}" class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Literatura:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.books" (ngModelChange)="check()" [disabled]="disableInput" [ngClass]="{'colorAlertDanger': error.books}" class="form-control" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+    <div [ngClass]="{'colorAlertDanger': error.cars}" class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <label class="marginTop5px">Auta:</label>
+    </div>
+    <div class="marginTop2 col-sm-4 pull-left marginBottom05">
+        <input [(ngModel)]="data.obj.cars" (ngModelChange)="check()" [disabled]="disableInput" [ngClass]="{'colorAlertDanger': error.cars}" class="form-control" placeholder="Podaj ilość" />
+    </div>
+    <div class="col-sm-12 pull-left"></div>
+</div>
+<div class="modal-footer">
+    <div class="col-sm-12 float-sm-right">
+        <input type="button" value="Zapisz" class="btn btn-primary cursorPointer" [disabled]="!saveAllow" (click)="save()" />
+        <input type="button" value="Zamknij" class="btn btn-danger cursorPointer" (click)="activeModal.close(false)" />
+    </div>
+</div> 

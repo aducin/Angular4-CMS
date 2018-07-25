@@ -1,0 +1,38 @@
+<div>
+	<app-header 
+	(logOut)="logOut()"
+	[name]="self"
+	></app-header>
+	<div class="paddingBottom2">
+		<app-message
+			[messageShow]="messageShow"
+			[messageType]="messageType"
+			[messageValue]="messageValue">
+		</app-message>
+		<div class="col-sm-12 pull-left"></div>
+		<div class="col-sm-12 col-md-1 col-xl-2 pull-left"></div>
+		<div class="col-sm-12 col-md-9 col-xl-8 pull-left marginTop1 bgrContent borderRadius10">
+			<order-header
+				[actions]="actions"
+				(removeOption)="this.removeFirst($event)"
+				[panels]="panels">
+			</order-header>
+		</div>
+	</div>
+	<div *ngIf="children">
+		<router-outlet></router-outlet>
+	</div>
+	<div *ngIf="!children">
+		<div class="paddingTop10">
+			<div class="col-sm-12 pull-left"></div>
+			<div class="col-sm-12 col-md-1 col-xl-2 pull-left"></div>
+			<div class="col-sm-12 col-md-9 col-xl-8 pull-left bgrContent borderRadius10 marginTop4 marginBottom30 paddingTop20px paddingBottom20px">
+				<div class="col-sm-12 pull-left">
+					<h3>{{this.config.chooseAction}}</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--<order-detail [cardDetails]="cardDetails" [chooseAction]="chooseAction" [customer]="customer" [empty]="empty" [orderDetails]="orderDetails" [orderId]="orderId"></order-detail>
+	-->
+</div>

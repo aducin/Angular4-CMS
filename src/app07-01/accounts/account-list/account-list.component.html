@@ -1,0 +1,127 @@
+<div *ngIf="accountList" class="paddingTop10">
+	<div class="col-sm-12 pull-left bgrContent borderRadius10 marginTop4 marginBottom30 paddingTop20px paddingBottom20px">
+        <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
+        <div *ngIf="empty">
+            <div class="col-sm-12 pull-left textAlignCenter">
+                <h3>Brak rachunków spełniających określone kryteria</h3>
+            </div>
+        </div>
+        <div *ngIf="!empty">
+            <div class="col-sm-12 pull-left textAlignCenter paddingBottom20px">
+                <h3 *ngIf="automatic">Lista rachunków - ostatnie {{amount}} wyników</h3>
+                <h3 *ngIf="!automatic">Lista rachunków z wybranego zakresu - {{amount}} wyników</h3>
+            </div>
+            <div class="paddingBottom20px">
+                <table class="table table-bordered">
+                    <thead>
+                        <th>Lp.</th>
+                        <th (click)="reSort('recipient')" class="textAlignCenter" cursorPointer>Klient
+                            <i *ngIf="sortBy==='recipient' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='recipient' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='recipient'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('address')" class="textAlignCenter" cursorPointer>Adres
+                            <i *ngIf="sortBy==='address' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='address' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='address'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('amountFloat')" class="textAlignCenter" cursorPointer>Kwota
+                            <i *ngIf="sortBy==='amountFloat' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='amountFloat' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='amountFloat'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('typeName')" class="textAlignCenter" cursorPointer>Rodzaj
+                            <i *ngIf="sortBy==='typeName' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='typeName' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='typeName'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('receipt')" class="textAlignCenter" cursorPointer>Nr dok.
+                            <i *ngIf="sortBy==='receipt' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='receipt' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='receipt'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('createTimestamp')" class="textAlignCenter" cursorPointer>Data dok.
+                            <i *ngIf="sortBy==='createTimestamp' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='createTimestamp' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='createTimestamp'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('cashTimestamp')" class="textAlignCenter" cursorPointer>Data wpłaty
+                            <i *ngIf="sortBy==='cashTimestamp' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='cashTimestamp' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='cashTimestamp'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('locs')" class="textAlignCenter" cursorPointer>Lok.
+                            <i *ngIf="sortBy==='locs' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='locs' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='locs'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('coach')" class="textAlignCenter" cursorPointer>Wagony
+                            <i *ngIf="sortBy==='coach' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='coach' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='coach'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('element')" class="textAlignCenter" cursorPointer>Element
+                            <i *ngIf="sortBy==='element' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='element' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='element'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('accessories')" class="textAlignCenter" cursorPointer>Części
+                            <i *ngIf="sortBy==='accessories' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='accessories' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='accessories'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('book')" class="textAlignCenter" cursorPointer>Książki
+                            <i *ngIf="sortBy==='book' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='book' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='book'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                        <th (click)="reSort('car')" class="textAlignCenter" cursorPointer>Auta
+                            <i *ngIf="sortBy==='car' && sortReverse" class="fa fa-sort-asc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy==='car' && !sortReverse" class="fa fa-sort-desc" aria-hidden="true"></i>
+                            <i *ngIf="sortBy!=='car'" class="fa fa-sort" aria-hidden="true"></i>
+                        </th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of accountList | orderBy: sortBy: sortReverse, let i = index" [class.activeRow]="item.id === selected" (click)="setActive(item.id)">
+                            <td *ngIf="item.closed === 0" class="colorAlertSuccess">{{i + 1}}.</td>
+                            <td *ngIf="item.closed === 1" class="colorAlertDanger">{{i + 1}}.</td>
+                            <td class="textAlignCenter">{{item.recipient}}</td>
+                            <td class="textAlignCenter">{{item.address}}</td>
+                            <td class="textAlignCenter">{{item.amount}}</td>
+                            <td class="textAlignCenter">{{item.typeName}}</td>
+                            <td class="textAlignCenter">{{item.receipt}}</td>
+                            <td class="textAlignCenter">{{item.createTime}}</td>
+                            <td class="textAlignCenter">{{item.cashTime}}</td>
+                            <td class="textAlignCenter">{{item.locs}}</td>
+                            <td class="textAlignCenter">{{item.coach}}</td>
+                            <td class="textAlignCenter">{{item.element}}</td>
+                            <td class="textAlignCenter">{{item.accessories}}</td>
+                            <td class="textAlignCenter">{{item.book}}</td>
+                            <td class="textAlignCenter">{{item.car}}</td>
+                        </tr>
+                        <tr>
+                            <td *ngIf="total.amount !== 0" colspan="4" class="textAlignCenter">Podsumowanie rachunków zamkniętych</td>
+                            <td *ngIf="total.amount !== 0" colspan="1" class="textAlignCenter">{{total.amount | number:'.2-2' }}zł</td>
+                            <td *ngIf="total.amount !== 0" colspan="3" class="textAlignCenter">
+                                <span *ngIf="total.amountIt !== 0">Stawka 17%: {{total.amountIt | number:'.2-2' }}zł</span>
+                            </td>
+                            <td *ngIf="total.amount === 0" colspan="8" class="textAlignCenter">Brak rachunków zamkniętych</td>
+                            <td class="textAlignCenter">{{total.locs}}</td>
+                            <td class="textAlignCenter">{{total.coach}}</td>
+                            <td class="textAlignCenter">{{total.element}}</td>
+                            <td class="textAlignCenter">{{total.accessories}}</td>
+                            <td class="textAlignCenter">{{total.book}}</td>
+                            <td class="textAlignCenter">{{total.car}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div *ngIf="total.tax !== 0" class="col-sm-12 pull-left textAlignCenter paddingBottom20px">
+                <h4>Kwota należnego podatku od modeli wynosi: {{total.tax | number:'.2-2' }}zł</h4>
+            </div>
+            <div *ngIf="total.taxIt !== 0" class="col-sm-12 pull-left textAlignCenter paddingBottom20px">
+                <h4>Kwota należnego podatku od usł. inf. wynosi: {{total.taxIt | number:'.2-2' }}zł</h4>
+            </div>
+        </div>
+    </div>
+</div>

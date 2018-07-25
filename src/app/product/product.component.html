@@ -1,0 +1,73 @@
+<div>
+	<app-header 
+	(logOut)="logOut()"
+	[name]="self"
+	></app-header>
+	<div class="paddingBottom2">
+		<app-message
+			[messageShow]="messageShow"
+			[messageType]="messageType"
+			[messageValue]="messageValue"
+		></app-message>
+		<div class="col-sm-12 pull-left"></div>
+		<div class="col-sm-12 col-md-1 col-xl-2 pull-left"></div>
+		<div class="col-sm-12 col-md-9 col-xl-8 pull-left marginTop1 bgrContent borderRadius10">
+			<product-header
+				[category]="category"
+				[children]="children"
+				[clear]="clear"
+				[idSearchInProgress]="idSearchInProgress"
+				[inputDisabled]="inputDisabled"
+				[manufactorer]="manufactorer"
+				(nameSearch)="nameSearch($event)"
+				(searchId)="idSearch($event)" 
+				[searchInProgress]="searchInProgress"
+			></product-header>
+		</div>
+		<div class="col-sm-12 col-md-2 col-xl-3 pull-left"></div>
+		<div *ngIf="children" class="paddingBottom2">
+			<div class="col-sm-12 pull-left"></div>
+			<router-outlet></router-outlet>
+		</div>
+		<div *ngIf="!children && !noModified">
+			<newest-order
+					(deleteNewest)="deleteNewest($event)"
+					[listNew]="newestOrderNew"
+					[listOld]="newestOrderOld"
+					[newest]="newestOrders"
+					[newestSearch]="newestSearch"
+					[url]="url"
+			></newest-order>
+			<modified
+					(deleteRow)="deleteSingle('modified', $event)"
+					[modified]="modifiedList"
+					[modifiedEmpty]="modifiedEmpty"
+					[modifiedSearch]="modifiedSearch"
+					[url]="url"
+			></modified>
+			<printing
+					(deleteRow)="deleteSingle('printing', $event)"
+					(refresh)="getPrinting()"
+					[deliveryEmpty]="deliveryEmpty"
+					[deliveryList]="deliveryList"
+					[printing]="printingList"
+					[printingEmpty]="printingEmpty"
+					[printingSearch]="printingSearch"
+					[token]="token"
+					[url]="urlFiles"
+			></printing>
+		</div>
+		<div *ngIf="!children && noModified">
+			<product-list
+				(deleteList)="hideList()" 
+				(refreshList)="namePrepare()" 
+				[emptySearch]="emptySearch" 
+				[productList]="productList" 
+				[url]="url" 
+				[imagePath]="imagePath" 
+				[listLength]="listLength"
+				[searchInProgress]="searchInProgress">
+			 </product-list>
+		</div>
+	</div>
+</div>

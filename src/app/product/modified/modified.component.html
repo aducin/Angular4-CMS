@@ -1,0 +1,38 @@
+<div>
+	<div class="col-sm-12 pull-left"></div>
+	<div class="col-sm-12 col-lg-2 pull-left"></div>
+	<div class="col-sm-12 col-lg-8 pull-left bgrContent borderRadius10 marginTop2 paddingTop20px">
+		<div *ngIf="modifiedSearch" class="col-sm-12 pull-left textAlignCenter">
+			<h3>Proszę czekać - wyszukiwanie produktów podmienionych...</h3>
+			<ngx-loading [show]="modifiedSearch" [config]="{ backdropBorderRadius: '8px'}" style="margin-top: -5px;"></ngx-loading>
+		</div>
+		<div *ngIf="modifiedEmpty && !modifiedSearch" class="col-sm-12 pull-left paddingBottom20px">
+			<h3>Obecnie brak produktów zmodyfikowanych.</h3>
+		</div>
+		<div *ngIf="!modifiedEmpty && !modifiedSearch" class="col-sm-12 pull-left paddingBottom20px">
+			<div class="paddingBottom10px">
+				<h3>Lista produktów zmodyfikowanych:</h3>
+			</div>
+			<table class="table table-striped table-bordered" style="width:100%;">
+				<thead>
+					<th class="textAlignCenter">Lp.</th>
+					<th class="textAlignCenter">ID</th>
+					<th class="textAlignCenter">Nazwa</th>
+					<th class="textAlignCenter">Data</th>
+					<th class="textAlignCenter">Akcja</th>
+				</thead>
+				<tbody>
+					<tr *ngFor="let item of modified; let i = index" class="textAlignCenter">
+						<td><h5 style="margin-top: 8px;">{{i + 1}}.</h5></td>
+						<td><h5 style="margin-top: 8px;">{{item.id}}</h5></td>
+						<td>
+							<a href="{{url}}{{item.id}}-{{item.link_rewrite}}.html" target="blank"><h5 style="margin-top: 8px;">{{item.name}}</h5></a>
+						</td> 
+						<td><h5 style="margin-top: 8px;">{{item.date}}</h5></td> 
+						<td><button type="button" (click)="delete(item.id)" class="btn btn-danger btn-block">Usuń wpis</button></td> 
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
