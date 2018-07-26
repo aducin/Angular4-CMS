@@ -1,0 +1,82 @@
+@mixin backgroundColor($value) {
+  background-color: $value;
+}
+
+@mixin border($size, $type, $color) {
+    border: $size $type $color;
+}
+
+@mixin darken($color, $font) {
+  color: $color;
+  font-family: $font;
+  &:hover {
+    color: darken($color, 20%);
+  }
+}
+
+@mixin fixed($bottom, $top, $left, $right) {
+    position: fixed;
+    bottom: $bottom;
+    top: $top;
+    left: $left;
+    right: $right
+}
+
+@mixin fontGoogle($font) {
+  $font: unquote($font);
+  @import url(https://fonts.googleapis.com/css?family=#{$font});
+}
+
+@mixin formSignin($marginBottom) {
+    margin-bottom: $marginBottom;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+@mixin hover($font, $color, $background) {
+    font-family: $font;
+    color: $color;
+    background-color: $background;
+}
+
+@mixin lighten($color) {
+  color: $color;
+  &:hover {
+    color: lighten($color, 10%);
+  }
+}
+
+@mixin paddings($bottom, $top, $left, $right) {
+    padding-bottom: $bottom;
+    padding-top: $top;
+    padding-left: $left;
+    padding-right: $right;
+}
+
+@mixin screenMax850 {
+  @media only screen and (max-width: 850px) {
+    @content;
+  }
+}
+
+@mixin screenMin850 {
+  @media only screen and (min-width: 850px) {
+    @content;
+  }
+}
+
+@mixin tableHorizontal {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+@mixin textAlign($type){
+    text-align: $type;
+}
+
+@mixin widthAndHeight($width, $height, $background: none) {
+    width: $width;
+    height: $height;
+    background-color: $background;
+}
