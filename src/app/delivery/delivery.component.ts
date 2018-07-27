@@ -32,7 +32,6 @@ export class DeliveryComponent implements OnInit {
   messageValue: string;
   selected: number = 0;
   self: string = 'delivery';
-  setRefresh: boolean = false;
   status: any[];
   success: boolean;
   token: string;
@@ -45,6 +44,9 @@ export class DeliveryComponent implements OnInit {
   ) { 
     this.deliveryTypes = this.config.deliveryTypes;
     this.status = this.config.deliveryStatus;
+    this.service.refresh.subscribe(() => {
+			this.getDeliveries(this.service.params);
+		});
   }
 
   ngOnInit() {
@@ -91,12 +93,9 @@ export class DeliveryComponent implements OnInit {
 
   getDeliveries(params = null) {
     this.loading = true;
-    this.setRefresh = false;
     this.service.getDeliveries(this.token, params)
     .subscribe( data => {
-      if (params !== null) {
-        this.automatic = false;
-      }
+      this.automatic = params !== null ? false : this.automatic;
 			this.handleData(data);
 		});
   }
@@ -105,7 +104,7 @@ export class DeliveryComponent implements OnInit {
     this.success = data.success;
 		this.empty = Boolean(data.empty);
     this.loading = false;
-    if (this.success) {
+    if (this.success && !this.empty) {
       this.deliveries = data.list;
       this.amount = data.list.length;
     }
@@ -165,7 +164,7 @@ export class DeliveryComponent implements OnInit {
     modalRef.componentInstance.data = final;
     modalRef.result.then((refresh) => {
 			if (refresh) {
-        this.setRefresh = true;
+        this.service.setClear();
 				this.getDeliveries();
 			}
 	  }, (reason) => {

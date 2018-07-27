@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
 
 import { Config } from '../config';
@@ -7,10 +7,18 @@ import { Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class DeliveryService {
-
+  clear = new EventEmitter();
   headers: Headers;
   message: string;
+  params: {
+    status: string,
+    type: string,
+    dateFrom: string,
+    dateTo: string
+  };
+  refresh = new EventEmitter();
   type: string;
+
   constructor(private http:Http, private config: Config) {
     this.headers = new Headers();
     this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -46,6 +54,10 @@ export class DeliveryService {
     return response;
   }
 
+  setClear() {
+    this.clear.emit();
+  }
+
   setDeliveries(data, method, token) {
   	let options = new RequestOptions({ headers: this.headers });
     let url = this.config.url + 'delivery/' + token;
@@ -63,4 +75,13 @@ export class DeliveryService {
     this.message = message;
   }
 
+  setParams(data: {
+    status: string,
+    type: string,
+    dateFrom: string,
+    dateTo: string
+  }) {
+    this.params = data;
+    this.refresh.emit();
+  }
 }

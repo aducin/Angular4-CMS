@@ -85,8 +85,7 @@ export class ProductComponent implements OnInit {
 		private config: Config, 
 		private modalService: NgbModal,  
 		private route: ActivatedRoute
-	) { 
-	}
+	) {}
 
 	ngOnInit() {
 		this.token = localStorage.getItem('angular4Token');

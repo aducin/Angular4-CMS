@@ -39,7 +39,6 @@ export class AccountsComponent implements OnInit {
 	messageShow: boolean = false;
 	messageType: string;
 	messageValue:string;
-	refresh: boolean = false;
 	selected: number = 0;
 	self: string = 'accounts';
 	success: boolean;
@@ -64,17 +63,22 @@ export class AccountsComponent implements OnInit {
 		private modalService: NgbModal,
 		private router: Router,
 		private service: AccountService
-	) {}
+	) {
+		this.service.refresh.subscribe(() => {
+			this.checkAccounts();
+		});
+	}
 
  	ngOnInit() {
 		this.token = localStorage.getItem('angular4Token');
-		if (this.token === undefined || this.token === null) {
+		if (!this.token) {
 			this.token = this.cookieService.get('angular4Token');
 		}
 		this.getAccounts();
 	}
 	 
-	checkAccounts(data) {
+	checkAccounts() {
+		let data = this.service.params;
 		this.loading = true;
 		this.service.getCustomAccounts(this.token, data)
 		.subscribe( data => {
@@ -100,7 +104,6 @@ export class AccountsComponent implements OnInit {
 
 	getAccounts() {
 		this.loading = true;
-		this.refresh = false;
 		this.service.getAccounts(this.token)
 		.subscribe( data => {
 			this.handleData(data);
@@ -191,7 +194,7 @@ export class AccountsComponent implements OnInit {
 		modalRef.componentInstance.data = data;
 		modalRef.result.then((refresh) => {
 			if (refresh) {
-				this.refresh = true;
+				this.service.setClear();
 				this.getAccounts();
 			}
 	  	}, (reason) => {

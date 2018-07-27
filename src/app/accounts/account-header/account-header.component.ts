@@ -1,16 +1,17 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 
 import { Config } from '../../config';
 import { CheckEmpty } from '../../shared/functions';
+import { AccountService } from '../../service/account.service';
 
 @Component({
 	selector: 'account-header',
 	templateUrl: './account-header.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class AccountHeaderComponent implements OnInit {
+export class AccountHeaderComponent {
     accountState: any[];
 	accountType: any[];
     currentState: number = -1;
@@ -20,29 +21,19 @@ export class AccountHeaderComponent implements OnInit {
 
     @Input() loading: boolean;
     @Input() refresh: boolean;
-    @Output() check = new EventEmitter<any>();
     @Output() openModal = new EventEmitter<string>();
     constructor(
         private config: Config,
-        private parserFormatter: NgbDateParserFormatter
+        private parserFormatter: NgbDateParserFormatter,
+		private service: AccountService
     ) {
         this.accountState = this.config.accountState;
         this.accountState.unshift(this.config.chooseAll);
 		this.accountType = this.config.accountType;
         this.accountType.unshift(this.config.chooseAll);
-    }
-
-    ngOnInit() {
-  	}
-
-    ngDoCheck() {
-        if (this.refresh) {
-            this.setEmpties();
-			this.currentState = -1;
-			this.currentType = -1;
-			this.dateFrom = undefined;
-			this.dateTo = undefined;
-        }
+		this.service.clear.subscribe(() => {
+			this.clearHeader();
+		});
     }
 
     checkAccounts() {
@@ -71,7 +62,15 @@ export class AccountHeaderComponent implements OnInit {
 				value: this.parserFormatter.format(this.dateTo)
 			});
 		}
-		this.check.emit(data);
+		this.service.setParams(data);
+	}
+
+	clearHeader() {
+		this.setEmpties();
+		this.currentState = -1;
+		this.currentType = -1;
+		this.dateFrom = undefined;
+		this.dateTo = undefined;	
 	}
 
     open(action) {

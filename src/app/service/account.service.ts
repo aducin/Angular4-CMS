@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
 
 import { Config } from '../config';
@@ -6,8 +6,11 @@ import { GetTime } from '../shared/functions';
 
 @Injectable()
 export class AccountService {
-
+  clear = new EventEmitter();
   headers: Headers;
+  params: any[];
+  refresh = new EventEmitter();
+
   constructor(private http:Http, private config: Config) {
     this.headers = new Headers();
     this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -98,4 +101,12 @@ export class AccountService {
   	.map(res => res.json());
 	}
 
+  setClear() {
+    this.clear.emit();
+  }
+
+  setParams(data: any[]) {
+    this.params = data;
+    this.refresh.emit();
+  }
 }

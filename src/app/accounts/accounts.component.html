@@ -15,11 +15,8 @@
 		<div class="col-sm-12 col-md-1 col-xl-2 pull-left"></div>
 		<div class="col-sm-12 col-md-9 col-xl-8 pull-left marginTop1 bgrContent borderRadius10">
 			<account-header
-			(check)="checkAccounts($event)"
-			[loading]="loading"
-			[refresh]="refresh"
-			(openModal)="open($event)"
-			>
+				[loading]="loading"
+				(openModal)="open($event)">
 			</account-header>
 		</div>
 		<div class="col-sm-4 pull-left"></div>
@@ -31,6 +28,6 @@
 		[empty]="empty" 
 		[loading]="loading" 
 		[total]="totals" 
-		(setSelected)="handleSelected($event)" 
-	></account-list>
+		(setSelected)="handleSelected($event)">
+	</account-list>
 <div>
