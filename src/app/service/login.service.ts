@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 
 import { Config } from '../config';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class LoginService {
@@ -13,7 +14,8 @@ export class LoginService {
 		  private cookieService: CookieService, 
 		  private http: Http, 
 		  private config: Config, 
-		  private router: Router
+		  private router: Router,
+		  private tokenService: TokenService
 	) {}
 
   	logIn(data) {
@@ -30,6 +32,7 @@ export class LoginService {
 		this.cookieService.delete('angular4Token');
 		localStorage.removeItem('angular4Token');
 		localStorage.removeItem('angular4User');
+		this.tokenService.clearToken();
 		this.router.navigate(['../login']);
 	}
 

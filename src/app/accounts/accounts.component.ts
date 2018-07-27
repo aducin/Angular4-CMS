@@ -6,12 +6,13 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { AccountService } from '../service/account.service';
 import { LoginService } from '../service/login.service';
+import { TokenService } from '../service/token.service';
 import { Config } from '../config';
+import { CheckEmpty } from '../shared/functions';
 
 import { Account } from '../model/account';
 import { AccountSummary } from '../model/accountSummary';
 import { AccountListComponent } from './account-list/account-list.component';
-
 import { AccountModal } from '../modal/accountModal.component';
 
 @Component({
@@ -41,9 +42,9 @@ export class AccountsComponent implements OnInit {
 	selected: number = 0;
 	self: string = 'accounts';
 	success: boolean;
-    toCount: string[] = ['locs', 'coach', 'element', 'accessories', 'book', 'car'];
+	toCount: string[] = ['locs', 'coach', 'element', 'accessories', 'book', 'car'];
 	token: string;
-    totals = {
+	totals = {
         amount: <number> 0,
         amountIt: <number> 0,
         locs: <number> 0,
@@ -55,38 +56,31 @@ export class AccountsComponent implements OnInit {
         tax: <number> 0,
         taxIt: <number> 0
     };
-    constructor(
+	constructor(
 		private cookieService: CookieService,
 		private loginService: LoginService,
 		private config: Config,
 		private modalService: NgbModal,
 		private router: Router,
-		private service: AccountService
+		private service: AccountService,
+		private tokenService: TokenService
 	) {
+		this.token = this.tokenService.getToken();
 		this.service.refresh.subscribe(() => {
 			this.checkAccounts();
 		});
 	}
 
  	ngOnInit() {
-		this.token = localStorage.getItem('angular4Token');
-		if (!this.token) {
-			this.token = this.cookieService.get('angular4Token');
-		}
 		this.getAccounts();
 	}
 	 
 	checkAccounts() {
-		let data = this.service.params;
 		this.loading = true;
-		this.service.getCustomAccounts(this.token, data)
+		this.service.getCustomAccounts(this.token, this.service.params)
 		.subscribe( data => {
 			this.handleData(data);
 		});
-	}
-
-	checkEmpty(obj) {
-		return obj.findIndex((el) => { return el.id === -1; });
 	}
 
 	displayMessage(messageType, messageValue, timer, method = null, action = null) {
@@ -156,11 +150,11 @@ export class AccountsComponent implements OnInit {
             data.obj.closed = -1;
             data.obj.type = -1;
 			data.title = this.config.accountTitle[0];
-			var stateCheck = this.checkEmpty(data.state);
+			var stateCheck = CheckEmpty(data.state);
 			if (stateCheck === -1) {
 				data.state.unshift(this.config.choose);	
 			}
-			var typeCheck = this.checkEmpty(data.type);
+			var typeCheck = CheckEmpty(data.type);
             if (typeCheck === -1) {
 				data.type.unshift(this.config.choose);
 			}

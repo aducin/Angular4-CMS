@@ -5,6 +5,7 @@ import { CookieService } from 'ngx-cookie';
 
 import { LoginService } from '../service/login.service';
 import { OrderService } from '../service/order.service';
+import { TokenService } from '../service/token.service';
 
 import { Config } from '../config';
 
@@ -42,18 +43,15 @@ export class OrderComponent implements OnInit {
 		  private loginService: LoginService, 
 		  private route: ActivatedRoute, 
 		  private router: Router, 
-		  private service: OrderService
+		  private service: OrderService,
+		  private tokenService: TokenService
 	) { 
+		this.token = this.tokenService.getToken();
 		this.actions = this.config.orderActions;
 		this.panels = this.config.orders;
 	}
 
-  	ngOnInit() {
-		this.token = localStorage.getItem('angular4Token');
-		if (this.token === undefined || this.token === null) {
-			this.token = this.cookieService.get('angular4Token');
-		}
-	}
+  	ngOnInit() {}
 
 	ngDoCheck() {
 		if (this.route.firstChild === null) {

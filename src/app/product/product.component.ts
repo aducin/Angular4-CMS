@@ -11,14 +11,15 @@ import 'rxjs/Rx';
 import { Product } from '../model/product';
 import { ProductShort } from '../model/productShort';
 import { Category } from '../model/category';
+import { Config } from '../config';
+import { LoginService } from '../service/login.service';
+import { ModalProductBasic } from '../modal/productBasic.component';
 import { Modified } from '../model/modified';
 import { NewestOrder } from '../model/newestOrder';
 import { Printing } from '../model/printing';
-import { Standard } from '../model/standard';
 import { ProductService } from '../service/product.service';
-import { LoginService } from '../service/login.service';
-import { Config } from '../config';
-import { ModalProductBasic } from '../modal/productBasic.component';
+import { Standard } from '../model/standard';
+import { TokenService } from '../service/token.service';
 
 @Component({
   	selector: 'app-product',
@@ -78,23 +79,22 @@ export class ProductComponent implements OnInit {
 	urlFiles: string;
 
 	constructor(
+		private config: Config, 
 		private cookieService: CookieService, 
 		private loginService: LoginService, 
-		private service: ProductService, 
-		private product: Product, 
-		private config: Config, 
 		private modalService: NgbModal,  
-		private route: ActivatedRoute
-	) {}
-
-	ngOnInit() {
-		this.token = localStorage.getItem('angular4Token');
-		if (this.token === undefined || this.token === null) {
-			this.token = this.cookieService.get('angular4Token');
-		}
+		private product: Product, 
+		private route: ActivatedRoute,
+		private service: ProductService, 
+		private tokenService: TokenService
+	) {
+		this.token = this.tokenService.getToken();
 		this.imagePath = this.config.imageSuffix;
 		this.url = this.config.serverPath;
 		this.urlFiles = this.config.serverPath + 'cms_spa/files/';
+	}
+
+	ngOnInit() {
 		this.getLists();
 		this.getModified();
 		this.getNewestOrders();

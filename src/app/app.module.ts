@@ -18,6 +18,7 @@ import { DeliveryModule } from './delivery/delivery.module';
 import { LoginGuard } from './login.guard';
 
 import { LoginService } from './service/login.service';
+import { TokenService } from './service/token.service';
 
 @NgModule({
   declarations: 
@@ -82,7 +83,8 @@ import { LoginService } from './service/login.service';
   [
     CookieService,
     LoginGuard, 
-    LoginService
+    LoginService,
+    TokenService
   ],
   bootstrap: 
   [

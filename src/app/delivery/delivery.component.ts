@@ -5,10 +5,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 
 import { DeliveryService } from '../service/delivery.service';
+import { LoginService } from '../service/login.service';
+import { TokenService } from '../service/token.service';
 
 import { Config } from '../config';
 import { Delivery } from '../model/delivery';
-
 import { DeliveryModal } from '../modal/deliveryModal.component';
 
 @Component({
@@ -38,10 +39,13 @@ export class DeliveryComponent implements OnInit {
   constructor(
     private cookieService: CookieService,
     private config: Config,
+    private loginService: LoginService, 
     private modalService: NgbModal,
 		private parserFormatter: NgbDateParserFormatter,
-    private service: DeliveryService
+    private service: DeliveryService,
+    private tokenService: TokenService
   ) { 
+    this.token = this.tokenService.getToken();
     this.deliveryTypes = this.config.deliveryTypes;
     this.status = this.config.deliveryStatus;
     this.service.refresh.subscribe(() => {
@@ -50,10 +54,6 @@ export class DeliveryComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.token = localStorage.getItem('angular4Token');
-		if (this.token === undefined || this.token === null) {
-			this.token = this.cookieService.get('angular4Token');
-		}
     this.getDeliveries();
   }
 

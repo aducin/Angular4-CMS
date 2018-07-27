@@ -30,7 +30,6 @@ import { PointerDirective } from '../directives/pointer.directive';
     MessageComponent,
     ActiveDirective,
     PointerDirective
-    
   ]
 })
 export class SharedModule { }

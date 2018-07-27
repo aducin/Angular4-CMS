@@ -3,5 +3,3 @@ export const CheckEmpty = (obj) => {
 }
 
 export const GetTime =  time => (new Date(time)).getTime() / 1000;
-
-

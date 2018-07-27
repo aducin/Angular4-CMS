@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 
 import { LoginService } from '../service/login.service';
+import { TokenService } from '../service/token.service';
 
 @Component({
   selector: 'app-login',
@@ -20,16 +21,19 @@ export class LoginComponent implements OnInit {
 	password: string;
 	remember: boolean = false;
 	result: string;
-  	constructor(private cookieService: CookieService, private router: Router, private service: LoginService) { }
+	token: string;
+  	constructor(
+		private cookieService: CookieService, 
+		private router: Router, 
+		private service: LoginService,
+		private tokenService: TokenService
+	) { 
+		this.token = this.tokenService.getToken();
+	}
 
   	ngOnInit() {
-  		this.cookieToken = this.cookieService.get('angular4Token');
-  		var curToken = localStorage.getItem('angular4Token');
-  		if (!curToken && this.cookieToken !== undefined) {
-  			curToken = this.cookieToken;
-  		}
-  		if (curToken) {
-  			this.tokenCheck(curToken);
+  		if (this.token) {
+  			this.tokenCheck(this.token);
   		} else {
   			localStorage.removeItem('angular4User');
   		}
@@ -62,9 +66,9 @@ export class LoginComponent implements OnInit {
   			this.loggedError = !data.success;
   			if (data.success) {
   				setTimeout(() => { 
-  					//localStorage.setItem('angular4Token', JSON.stringify(data.token));
 					localStorage.setItem('angular4Token', data.token);
 					this.cookieService.set( data.token, data.token, 720 );
+					this.tokenService.setNewToken(data.token);
   					localStorage.setItem('angular4User', JSON.stringify(data.user));
   					if (this.remember) {
   						this.cookieService.set( 'angular4Token', data.token, 604800 );
@@ -90,5 +94,4 @@ export class LoginComponent implements OnInit {
   			}
   		});	
   	}
-
 }

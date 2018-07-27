@@ -7,6 +7,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import { Postal } from '../model/postal';
 import { PostalService } from '../service/postal.service';
+import { TokenService } from '../service/token.service';
 import { LoginService } from '../service/login.service';
 import { Config } from '../config';
 
@@ -43,15 +44,13 @@ export class PostalComponent implements OnInit {
         private config: Config,
         private modalService: NgbModal,
         private router: Router,
-        private service: PostalService
-    ) {}
+        private service: PostalService,
+        private tokenService: TokenService
+    ) {
+      this.token = this.tokenService.getToken();
+    }
 
   ngOnInit() {
-    //this.token = JSON.parse(localStorage.getItem('angular4Token'));
-    this.token = localStorage.getItem('angular4Token');
-		if (this.token === undefined || this.token === null) {
-			this.token = this.cookieService.get('angular4Token');
-		}
   	this.getPostal();
   }
 
