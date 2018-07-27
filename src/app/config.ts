@@ -34,6 +34,7 @@ export class Config {
 	emptyVoucher: string = 'Użytkownik nie posiada zamówień na min. 50zł.';
 	loading: 'Trwa wyszukiwanie - proszę czekać...';
 	loggedOut: string = 'Zostałeś skutecznie wylogowany!';
+	notANumber: string = 'Podaj liczbę!';
 	orderActions: any[] = [
 		{ id: -1, name: 'Wybierz Akcję'}, 
 		{ id: 0, name: 'Sprawdź kupon', value: 'voucher'},
@@ -42,8 +43,9 @@ export class Config {
 		{ id: 3, name: 'Wyślij ponowny mail SP', value: 'mailOld'}
 	];
 	orders: any[] = [{ id: -1, name: 'Wybierz Panel'},{ id: 0, name: 'Nowy Panel', value: 'new'}, { id: 1, name: 'Stary Panel', value: 'old'}];
-	notANumber: string = 'Podaj liczbę!';
+	
 	postalActions: string[] = ['Dodaj środki', 'Odejmij środki'];
-	timer: 3000;
+	searchInterval: number = 1000;
+	timer: number = 3000;
 	waiting: string = 'Proszę czekać';
 }

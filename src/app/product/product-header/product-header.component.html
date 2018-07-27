@@ -15,7 +15,7 @@
 					<select 
 						[(ngModel)]="currentCategory" 
 						(change)="namePrepare()" 
-						[disabled]="children || inputDisabled" 
+						[disabled]="children || idSearchInProgress || idSearchInProgress || inputDisabled" 
 						class="form-control"
 						cursorPointer>
 						<option *ngFor="let single of category" [ngValue]="single.id">{{single.metaTitle}}</option>
@@ -28,8 +28,8 @@
 				<div class="col-sm-12 col-lg-8 pull-right paddingBottom2">
 					<select 
 						[(ngModel)]="currentManufactorer" 
-						(change)="namePrepare()" 
-						[disabled]="children || inputDisabled" 
+						(change)="nameSearch()" 
+						[disabled]="children || idSearchInProgress || idSearchInProgress || inputDisabled" 
 						class="form-control"
 						cursorPointer> 
 						<option *ngFor="let single of manufactorer" [ngValue]="single.id">{{single.name}}</option>
@@ -44,7 +44,7 @@
                         (keyup)="namePrepare()" 
                         [(ngModel)]="currentName" 
                         #name="ngModel" 
-                        [disabled]="children || inputDisabled" 
+                        [disabled]="children || idSearchInProgress"
                         id="name" 
                         name="name" 
                         minlength="4" 
@@ -65,7 +65,7 @@
 					<input 
                         (keyup)="idSearch()" 
                         [(ngModel)]="currentId" 
-                        [disabled]="children || inputDisabled"  
+                        [disabled]="children || idSearchInProgress"  
                         class="form-control textAlignCenter" 
                         placeholder="Podaj numer ID"
 						inputActive 

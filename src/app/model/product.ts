@@ -40,3 +40,9 @@ export class Product {
 	tagString: string;
 	url: string;
 }
+
+export class NameSearch {
+	name: string;
+	category: number;
+	manufactorer: number
+}

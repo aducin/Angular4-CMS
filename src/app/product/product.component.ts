@@ -8,7 +8,7 @@ import { CookieOptionsArgs } from '../model/cookieOptionArgs';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
-import { Product } from '../model/product';
+import { Product, NameSearch } from '../model/product';
 import { ProductShort } from '../model/productShort';
 import { Category } from '../model/category';
 import { Config } from '../config';
@@ -27,17 +27,11 @@ import { TokenService } from '../service/token.service';
   	styleUrls: ['./product.component.css'],
   	encapsulation: ViewEncapsulation.None,
 	styles: [`
-		.current-modal {
-			position: fixed;
-			top: 10%;
-		}
-		.modal-content {
-			width: 120%;
-		}`
+		.current-modal { position: fixed; top: 10% }
+		.modal-content { width: 120% }`
 	]
 })
 export class ProductComponent implements OnInit {
-
 	category: Category[];
 	children: boolean;
 	clear: boolean = false;
@@ -95,6 +89,8 @@ export class ProductComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.service.idSearch.subscribe((id: number) => this.idSearch(id));
+		this.service.nameSearch.subscribe((dataObj: NameSearch) => {this.nameSearch(dataObj)});
 		this.getLists();
 		this.getModified();
 		this.getNewestOrders();
@@ -151,7 +147,6 @@ export class ProductComponent implements OnInit {
 			}
 		}, timer);
 	}
-
 
 	getLists() {
 		let cachedCategories = JSON.parse(localStorage.getItem('categories'));
@@ -224,19 +219,15 @@ export class ProductComponent implements OnInit {
 
 	hideList() {
 		this.noModified = false;
-		this.clear = true;
-		setTimeout(() => {
-			this.clear = false;	
-		}, 0);
+		this.service.setClear();
 	}
 
 	idSearch(id) {
 		this.idSearchInProgress = true;
 		setTimeout(() => { 
-			this.inputDisabled = true; 
 			this.service.getIdSearch(id)
 			.subscribe( data => {
-				this.inputDisabled = false;
+				this.noModified = false;
 				this.product = this.setDetails(data, true);
 				this.productList = undefined;
 				this.idSearchInProgress = false;
@@ -252,24 +243,21 @@ export class ProductComponent implements OnInit {
 	nameSearch(obj) {
 		this.emptySearch = false;
 		this.searchInProgress = true;
-		setTimeout(() => { 
-			this.inputDisabled = true; 
-			this.service.getNameSearch(obj.name, obj.category, obj.manufactorer)
-			.subscribe( data => {
-				this.noModified = true;
-				if (data.success !== undefined && data.success === false) {
-					this.emptySearch = true;
-				} else {
-					this.productList = data.map((el) => {
-						el = this.setDetails(el, false);
-						return el;
-					});
-					this.listLength = this.productList.length;
-					this.emptySearch = false;
-				}
-				this.inputDisabled = this.searchInProgress = false;
-			});	
-		}, 1000);
+		this.service.getNameSearch(obj.name, obj.category, obj.manufactorer)
+		.subscribe( data => {
+			this.noModified = true;
+			if (data.success !== undefined && data.success === false) {
+				this.emptySearch = true;
+			} else {
+				this.productList = data.map((el) => {
+					el = this.setDetails(el, false);
+					return el;
+				});
+				this.listLength = this.productList.length;
+				this.emptySearch = false;
+			}
+			this.searchInProgress = false;
+		});	
 	}
 
 	openModal() {

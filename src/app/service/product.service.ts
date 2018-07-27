@@ -1,19 +1,22 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
 import { Http, Headers, RequestOptions } from "@angular/http";
 
 import { Config } from '../config';
-import { Product } from '../model/product';
+import { Product, NameSearch } from '../model/product';
 
 import { Observable } from 'rxjs/Rx';
 import 'rxjs/add/observable/forkJoin';
 
 @Injectable()
 export class ProductService {
-
+	clear = new EventEmitter();  
   	headers: Headers;
+	idSearch = new EventEmitter<number>();  
+	nameSearch = new EventEmitter<NameSearch>();  
   	toRefresh: boolean = false;
 	toSave: boolean = false;
+
 	constructor(private http: Http, private config: Config, private product: Product) {}
 
 	addPrinting(data) {
@@ -97,6 +100,18 @@ export class ProductService {
 
 	getToSave() {
 		return this.toSave;
+	}
+
+	setClear() {
+		this.clear.emit();
+	}
+
+	setIdSearch(id: number) {
+    	this.idSearch.emit(id);
+  	}
+
+	setNameSearch(obj: NameSearch) {
+		this.nameSearch.emit(obj);
 	}
 
 	setProduct(obj) {
