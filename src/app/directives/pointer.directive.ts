@@ -1,10 +1,10 @@
-import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
 
 @Directive({
   selector: '[cursorPointer]'
 })
 export class PointerDirective {
-  	constructor(private el: ElementRef) { }
+  	constructor(private el: ElementRef, private renderer: Renderer2) { }
 
 	@HostListener('mouseenter') onMouseEnter() {
 	    this.setCursor('pointer');
@@ -15,7 +15,8 @@ export class PointerDirective {
     }
 
     private setCursor(cursor: string) {
-    	this.el.nativeElement.style.cursor = cursor;
+		this.renderer.setStyle(this.el.nativeElement, 'cursor', cursor);
+    	//this.el.nativeElement.style.cursor = cursor;
   	}
 
 }

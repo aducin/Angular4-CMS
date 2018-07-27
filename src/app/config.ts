@@ -15,6 +15,13 @@ export class Config {
 		{ id: 5, name: 'Zwrot'}
 	];
 	active: any[] = [{ id: 0, name: 'Nieaktywny'},{ id: 1, name: 'Aktywny'}];
+	bookmarks: any[] = [
+		{ id: 1, name: 'Produkty', link: "products" },
+		{ id: 2, name: 'Zamówienia', link: "orders" },
+		{ id: 3, name: 'Wysyłki', link: "postal" },
+		{ id: 4, name: 'Rachunki', link: "accounts" },
+		{ id: 5, name: 'Przyjęcia', link: "delivery" },
+	];
 	choose: any = { id: -1, name: 'Wybierz'};
 	chooseAll: any = { id: -1, name: 'Wszystkie'};
 	chooseAction: string = "Wybierz akcję i wpisz numer ID.";

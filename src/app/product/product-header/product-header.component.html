@@ -12,7 +12,12 @@
 					<h4>Kategoria</h4>
 				</div>
 				<div class="col-sm-12 col-lg-8 pull-right paddingBottom2">
-					<select [(ngModel)]="currentCategory" (change)="namePrepare()" [disabled]="children || inputDisabled" class="form-control">
+					<select 
+						[(ngModel)]="currentCategory" 
+						(change)="namePrepare()" 
+						[disabled]="children || inputDisabled" 
+						class="form-control"
+						cursorPointer>
 						<option *ngFor="let single of category" [ngValue]="single.id">{{single.metaTitle}}</option>
 					</select>
 				</div>
@@ -21,7 +26,12 @@
 					<h4>Producent</h4>
 				</div>
 				<div class="col-sm-12 col-lg-8 pull-right paddingBottom2">
-					<select [(ngModel)]="currentManufactorer" (change)="namePrepare()" [disabled]="children || inputDisabled" class="form-control"> 
+					<select 
+						[(ngModel)]="currentManufactorer" 
+						(change)="namePrepare()" 
+						[disabled]="children || inputDisabled" 
+						class="form-control"
+						cursorPointer> 
 						<option *ngFor="let single of manufactorer" [ngValue]="single.id">{{single.name}}</option>
 					</select>
 				</div>
@@ -39,7 +49,8 @@
                         name="name" 
                         minlength="4" 
                         class="form-control textAlignCenter" 
-                        placeholder="Podaj nazwę" 
+                        placeholder="Podaj nazwę"
+						inputActive  
                     />
 					<div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger textAlignCenter marginTop3">
 						<div *ngIf="name.errors.minlength">Wpisz min. 4 znaki!</div>
@@ -54,10 +65,10 @@
 					<input 
                         (keyup)="idSearch()" 
                         [(ngModel)]="currentId" 
-                        [disabled]="children || inputDisabled" 
-                        id="id" 
+                        [disabled]="children || inputDisabled"  
                         class="form-control textAlignCenter" 
-                        placeholder="Podaj numer ID" 
+                        placeholder="Podaj numer ID"
+						inputActive 
                     />
 					<div *ngIf="error.id" class="alert alert-danger textAlignCenter marginTop3">Podaj liczbę, Łośku!</div>
 				</div>

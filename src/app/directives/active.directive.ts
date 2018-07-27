@@ -1,26 +1,30 @@
-import { Directive, ElementRef, HostListener, Input, Output } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
 
 @Directive({
-  selector: '[active]',
+  selector: '[inputActive]',
 })
-export class ActiveDirective {
+export class ActiveDirective implements OnInit {
+  colorActive: string = '#FCF18F';
+  colorInActive: string = '#FFFFFF';
 
-  selected: number = 0;
-  @Input() id: number;
-  constructor(private el: ElementRef) { }
+  @Input() disabled: boolean;
+  constructor(private el: ElementRef, private renderer: Renderer2) { }
 
-  @HostListener('click') onClick() {
-	  this.handleActive(this.id);
+  ngOnInit() {
+    this.handleFocus(this.colorInActive);
+  }
+
+  @HostListener('blur') onBlur() {
+    this.handleFocus(this.colorInActive);
+  }
+
+  @HostListener('focus') onFocus() {
+    if (!this.disabled) {
+      this.handleFocus(this.colorActive);
+    } 
   }
   
-  private handleActive(id: number) {
-    if (this.id !== this.selected) {
-      this.selected = this.id;
-      this.el.nativeElement.style.backgroundColor = '#7d6464';
-    } else {
-      this.selected = 0;
-      this.el.nativeElement.style.backgroundColor = null;
-    }
+  private handleFocus(style: string) {
+    this.renderer.setStyle(this.el.nativeElement, 'background-color', style);
   }
-
 }
