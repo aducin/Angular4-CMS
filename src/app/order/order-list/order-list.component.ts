@@ -9,6 +9,7 @@ import { Customer } from '../../model/customer';
 import { Voucher } from '../../model/voucher';
 
 import { Config } from '../../config';
+import { TokenService } from '../../service/token.service';
 
 @Component({
   selector: 'app-order-list',
@@ -45,18 +46,17 @@ export class OrderListComponent implements OnInit {
     private config: Config, 
     private route: ActivatedRoute, 
     private router: Router, 
-    private service: OrderService
-  ) {}
-
-  ngOnInit() {
+    private service: OrderService,
+    private tokenService: TokenService
+  ) {
     this.serverPath = this.config.serverPath;
-    this.token = localStorage.getItem('angular4Token');
+    this.token = this.tokenService.getToken();
   }
 
+  ngOnInit() {}
+
   ngDoCheck() {
-    if (this.route.snapshot.params.db === undefined && this.route.snapshot.params.id === undefined) {
-      return false;
-    } else {
+    if (this.route.snapshot.params.db && this.route.snapshot.params.id) {
       this.db = this.route.snapshot.params.db;
       this.dbName = this.db === 'old' ? 'Stary panel' : 'Nowy panel';
       this.dbShortcut = this.db === 'old' ? ['SP', 'NP'] : ['NP', 'SP'];
@@ -119,11 +119,11 @@ export class OrderListComponent implements OnInit {
     this.service.evenOrder(this.db, this.id, this.token)
         .subscribe( data => {
           this.searching = false;
-          if (!data.success) {
-            this.handleFailure(data);
-          } else {
+          if (data[0]) {
             this.empty = false;
             this.evenDetails = data;
+          } else {
+            this.handleFailure(data);
           }
         });
   }
