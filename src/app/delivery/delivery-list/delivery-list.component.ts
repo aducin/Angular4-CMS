@@ -2,8 +2,10 @@ import { Component, DoCheck, EventEmitter, Input, OnInit, Output } from '@angula
 
 import { Delivery } from '../../model/delivery';
 import { DeliveryService } from '../../service/delivery.service';
+import { MessageService } from '../../service/message.service';
 
 import { Config } from '../../config';
+import { Message } from '../../shared/functions';
 
 import { Ng4FilesConfig, Ng4FilesSelected, Ng4FilesService, Ng4FilesStatus } from '../../../../node_modules/angular4-files-upload/src/app/ng4-files';
 
@@ -29,9 +31,9 @@ export class DeliveryListComponent implements OnInit {
   @Input() empty:boolean;
   @Input() loading:boolean;
   @Output() setSelected = new EventEmitter<number>();
-  @Output() refreshList = new EventEmitter();
   constructor(
     private config: Config,
+    private messageService: MessageService,
     private ng4FilesService: Ng4FilesService,
     private service: DeliveryService
   ) { 
@@ -85,8 +87,8 @@ export class DeliveryListComponent implements OnInit {
       } else {
         this.type = 'error';
       }
-      this.service.setMessage(this.type, this.message);
-      this.refreshList.emit();
+      this.messageService.setMessage( Message(this.type, this.message) );
+      this.service.setInitialState();
 		});
   }
 

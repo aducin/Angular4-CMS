@@ -45,25 +45,32 @@ export class DeliveryHeaderComponent {
     }
 
     checkDeliveries() {
-        var curObj = {
-            status: <string>'',
-            type: <string>'',
-            dateFrom: <string>'',
-            dateTo: <string>'',
-        };
-        ['currentStatus', 'currentType'].forEach((el) => {
-            if (this[el] !== -1) {
-                let name = el.split('current');
-                let final = name[1].toLowerCase();
-                curObj[final] = this[el];
-            }
-        });
-        ['dateFrom', 'dateTo'].forEach((el) => {
-            if (this[el]) {
-                curObj[el] = this[el].year + '-' + this[el].month + '-' + this[el].day;
-            }
-        }); 
-        this.service.setParams(curObj);
+        let data = [];
+		if (this.currentStatus !== -1) {
+			data.push( {
+				key: 'status',
+				value: this.currentStatus
+			});
+		}
+		if (this.currentType !== -1) {
+			data.push( {
+				key: 'type',
+				value: this.currentType
+			});
+		}
+		if (this.dateFrom !== undefined) {
+			data.push({ 
+				key: 'dateFrom',
+				value: this.parserFormatter.format(this.dateFrom)
+			});
+		}
+		if (this.dateTo !== undefined) {
+			data.push({ 
+				key: 'dateTo',
+				value: this.parserFormatter.format(this.dateTo)
+			});
+		}
+		this.service.setParams(data);
     }
 
     open(action) {

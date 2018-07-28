@@ -8,15 +8,13 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CookieModule } from 'ngx-cookie';
 import { Ng4FilesModule } from '../../../node_modules/angular4-files-upload/src/app/ng4-files';
 
-import { SharedModule } from '../shared/shared.module';
-
+import { LoginGuard } from '../login.guard';
+import { MessageService } from '../service/message.service';
 import { Product } from '../model/product';
 import { ProductService } from '../service/product.service';
 import { ProductShort } from '../model/productShort';
-
-import { LoginGuard } from '../login.guard';
-
 import { ProductComponent } from './product.component';
+import { SharedModule } from '../shared/shared.module';
 import { LoginComponent } from '../login/login.component';
 import { EditionComponent } from './edition/edition.component';
 import { HistoryComponent } from './history/history.component';
@@ -85,6 +83,7 @@ export const routes: Routes = [
 		Product,
 		ProductService,
 		ProductShort,
+		MessageService
 	],
 	bootstrap: 
 	[

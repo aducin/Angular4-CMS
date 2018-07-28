@@ -1,18 +1,17 @@
 import { Component, DoCheck, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CookieService, CookieOptions } from 'ngx-cookie';
 import { CookieOptionsArgs } from '../model/cookieOptionArgs';
-
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
 
 import { Product, NameSearch } from '../model/product';
 import { ProductShort } from '../model/productShort';
 import { Category } from '../model/category';
 import { Config } from '../config';
 import { LoginService } from '../service/login.service';
+import { Message } from '../shared/functions';
+import { MessageService } from '../service/message.service';
 import { ModalProductBasic } from '../modal/productBasic.component';
 import { Modified } from '../model/modified';
 import { NewestOrder } from '../model/newestOrder';
@@ -41,7 +40,6 @@ export class ProductComponent implements OnInit {
 	emptySearch: boolean = false;
 	error;
 	idSearchInProgress: boolean = false;
-	imagePath: string;
 	inputDisabled: boolean = true;
 	listLength: number = 0;
 	manufactorer: Standard[];
@@ -53,21 +51,16 @@ export class ProductComponent implements OnInit {
 	modifiedSearch: boolean = true;
 	newestOrderNew: NewestOrder[];
 	newestOrderOld: NewestOrder[];
-	newestOrders: {
-		new: number,
-		old: number,
-	};
+	newestOrders: { new: number, old: number };
 	newestSearch: boolean = false;
 	noModified: boolean = false;
 	printingEmpty: boolean;
 	printingList: Printing[];
 	printingSearch: boolean = false;
 	productList: ProductShort[];
-	saveInProgress: boolean = false;
 	searchInProgress: boolean = false;
 	self: string = 'products';
 	subscription;
-	timer: number = 300000;
 	token: string;
 	url: string;
 	urlFiles: string;
@@ -76,46 +69,37 @@ export class ProductComponent implements OnInit {
 		private config: Config, 
 		private cookieService: CookieService, 
 		private loginService: LoginService, 
+		private messageService: MessageService,
 		private modalService: NgbModal,  
 		private product: Product, 
 		private route: ActivatedRoute,
+		private router: Router,
 		private service: ProductService, 
 		private tokenService: TokenService
 	) {
 		this.token = this.tokenService.getToken();
-		this.imagePath = this.config.imageSuffix;
 		this.url = this.config.serverPath;
 		this.urlFiles = this.config.serverPath + 'cms_spa/files/';
-	}
-
-	ngOnInit() {
+		this.messageService.display.subscribe((data) => this.messageDisplay(data));
+		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
 		this.service.idSearch.subscribe((id: number) => this.idSearch(id));
-		this.service.nameSearch.subscribe((dataObj: NameSearch) => {this.nameSearch(dataObj)});
-		this.getLists();
-		this.getModified();
-		this.getNewestOrders();
-		this.setOrdersInterval();
-		this.getPrinting();
+		this.service.modyfiedRefresh.subscribe(() => this.getModified());
+		this.service.nameSearch.subscribe((dataObj: NameSearch) => this.nameSearch(dataObj));
+		this.service.save.subscribe(() => this.saveProduct(this.service.getProduct()));
+		this.subscription = this.service.interval.subscribe( () => this.getNewestOrders() );
 	}
 
-	ngDoCheck() {
-		this.children = (this.route.firstChild && this.route.firstChild.snapshot.params['id'] !== undefined);
-		if (this.service.getToSave() && !this.saveInProgress) {
-			this.saveInProgress = true;
-			let curObj = this.service.getProduct();
-			this.saveProduct(curObj);
-		}
-	}
+	ngOnInit() { this.initModule() }
 
-	ngOnDestroy() {
-		this.unsubscribe();
-	}
+	ngDoCheck() { this.setChildren() }
+
+	ngOnDestroy() { this.unsubscribe() }
 
 	deleteSingle(field, id) {
 		this.service.deleteAdditional(field, id, this.token)
 		.subscribe( data => {
 			let curType = data.success !== false ? 'success' : 'error';
-			this.displayMessage(curType, data.reason, 3000);
+			this.messageService.setMessage( Message(curType, data.reason) );
 			if (field === 'modified') {
 				this.getModified();
 			} else if (field === 'printing') {
@@ -130,22 +114,10 @@ export class ProductComponent implements OnInit {
 		this.service.deleteNewest(event.db, event.id, this.token)
 			.subscribe( data => {
 				if (data.success) {
-					this.displayMessage('success', data.reason, 2000);
+					this.messageService.setMessage( Message('success', data.reason) );
 					this.getNewestOrders();
 				}
 			});
-	}
-
-	displayMessage(messageType, messageValue, timer, method = null, action = null) {
-		this.messageShow = true;
-		this.messageType = messageType;
-  		this.messageValue = messageValue;
-  		setTimeout(() => {
-			this.messageShow = false;
-			if (method && action) {
-				this[method][action]();
-			}
-		}, timer);
 	}
 
 	getLists() {
@@ -228,7 +200,7 @@ export class ProductComponent implements OnInit {
 			this.service.getIdSearch(id)
 			.subscribe( data => {
 				this.noModified = false;
-				this.product = this.setDetails(data, true);
+				this.product = data;
 				this.productList = undefined;
 				this.idSearchInProgress = false;
 				this.openModal();
@@ -236,8 +208,21 @@ export class ProductComponent implements OnInit {
 		}, 1000);
 	}
 
+	initModule() {
+		this.getLists();
+		this.getModified();
+		this.getNewestOrders();
+		this.getPrinting();
+	}
+
 	logOut() {
-		this.displayMessage('success', this.config.loggedOut, this.config.timer, 'loginService', 'logOut');
+		this.messageService.setMessage( Message('success', this.config.loggedOut, 'logOut', 'loginService') );
+	}
+
+	messageDisplay(data) {
+		this.messageShow = data.display;
+		this.messageType = data.type;
+  		this.messageValue = data.value;
 	}
 
 	nameSearch(obj) {
@@ -246,11 +231,11 @@ export class ProductComponent implements OnInit {
 		this.service.getNameSearch(obj.name, obj.category, obj.manufactorer)
 		.subscribe( data => {
 			this.noModified = true;
-			if (data.success !== undefined && data.success === false) {
+			if (data.success === false) {
 				this.emptySearch = true;
 			} else {
 				this.productList = data.map((el) => {
-					el = this.setDetails(el, false);
+					el.imgPath = this.url + this.config.imageSuffix + el.id + '-' + el.image + '-thickbox.jpg';
 					return el;
 				});
 				this.listLength = this.productList.length;
@@ -265,79 +250,39 @@ export class ProductComponent implements OnInit {
   		modalRef.componentInstance.product = this.product;
 	}
 
+	postMessageAction(data) {
+		if (this[data.object]) {
+			if (data.action === 'navigate') {
+				this.router.navigate(['../login']);
+			} else {
+				this[data.object][data.action]();
+			}
+		}
+	}
+
 	saveProduct(obj) {
-		let curObj = <any>{};
-		let curAmount = obj.quantityBoth
-		curObj = obj;
+		let curObj = {...obj};
 		curObj.action = 'full';
 		curObj.db = 'both';
-		curObj.quantity = parseInt(curAmount);
+		curObj.quantity = parseInt(obj.quantityBoth);
 		curObj.productTags = obj.tagString;
-		curObj.productCategories = <any>[];
+		curObj.productCategories = [];
 		obj.categories.forEach(el => {
 			if (el.checked) { curObj.productCategories.push(el.id); }
 		});
-		['categories', 'manufactorers', 'productCategoriesName'].forEach(el => {
-			delete(curObj[el]);
-		});
+		['categories', 'manufactorers', 'productCategoriesName'].forEach(el => delete(curObj[el]));
 		window.scrollTo(0, 0);
 		this.service.updateProduct(curObj)
 		.subscribe( data => {
 			let curType = data.success !== false ? 'success' : 'error';
 			window.scrollTo(0, 0);
-			this.saveInProgress = false;
-			this.service.setRefresh(true);
-			this.displayMessage(curType, data.reason, 3000);
-			this.getModified();
+			this.messageService.setMessage( Message(curType, data.reason) );
+			this.service.setRefresh();
 		});	
 	}
 
-	setDetails(el, deep) {
-		el.imgPath = this.url + this.imagePath + el.id + '-' + el.image + '-thickbox.jpg';
-		if(deep) {
-			if (!el.discount.new && !el.discount.old) {
-				var block = false;
-				el.priceReal = {
-					new: el.price.new,
-					old: el.price.old,
-				};
-			} else {
-				var block = true;
-				var discountValue = 0;
-				el.priceReal = {
-					new: null,
-					old: null,
-				};
-				if (el.discount.new.reduction !== undefined) {
-					if (el.discount.new.reductionType === 'amount') {
-						el.priceReal.new = Math.round((el.price.new - el.discount.new.reduction) * 100) / 100;
-					} else if (el.discount.new.reductionType === 'percentage') {
-						let curAmount = el.price.new * (el.discount.new.reduction / 100);
-						el.priceReal.new = Math.round((el.price.new - curAmount) * 100) / 100;
-					}
-					discountValue++;
-				}
-				if (el.discount.old.reduction !== undefined) {
-					if (el.discount.old.reductionType === 'amount') {
-						el.priceReal.old = Math.round((el.price.old - el.discount.old.reduction) * 100) / 100;
-					} else if (el.discount.old.reductionType === 'percentage') {
-						let curAmount = el.price.old * (el.discount.old.reduction / 100);
-						el.priceReal.old = Math.round((el.price.old - curAmount) * 100) / 100;
-					}
-					discountValue++;
-				}
-				el.priceBlock = block;
-				el.discountValue = discountValue;
-			}
-		}
-		return el;
-	}
-
-	setOrdersInterval() {
-		const source = Observable.interval(this.timer);
-		this.subscription = source.subscribe(() => {
-			this.getNewestOrders();
-		});
+	setChildren() {
+		this.children = (this.route.firstChild && this.route.firstChild.snapshot.params['id'] !== undefined);
 	}
 
 	unsubscribe() {

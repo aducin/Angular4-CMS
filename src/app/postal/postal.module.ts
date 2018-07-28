@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { LoginGuard } from '../login.guard';
 
 import { SharedModule } from '../shared/shared.module';
+import { MessageService } from '../service/message.service';
 import { PostalService } from '../service/postal.service';
 import { PostalComponent } from './postal.component';
 import { PostalHeaderComponent } from './postal-header/postal-header.component';
@@ -45,6 +46,7 @@ export const postalRouting = RouterModule.forChild(postalRoutes);
 	],
 	providers: [
 		LoginGuard,
+		MessageService,
 		PostalService
 	],
 	bootstrap: [

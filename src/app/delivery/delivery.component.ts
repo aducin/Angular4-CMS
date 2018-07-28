@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { CookieService } from 'ngx-cookie';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -6,9 +7,10 @@ import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 
 import { DeliveryService } from '../service/delivery.service';
 import { LoginService } from '../service/login.service';
+import { MessageService } from '../service/message.service';
 import { TokenService } from '../service/token.service';
-
 import { Config } from '../config';
+import { Message, SplitDate } from '../shared/functions';
 import { Delivery } from '../model/delivery';
 import { DeliveryModal } from '../modal/deliveryModal.component';
 
@@ -19,7 +21,6 @@ import { DeliveryModal } from '../modal/deliveryModal.component';
   encapsulation: ViewEncapsulation.None
 })
 export class DeliveryComponent implements OnInit {
-
   amount: number;
   automatic: boolean = true;
   currentStatus: number = -1;
@@ -36,66 +37,38 @@ export class DeliveryComponent implements OnInit {
   status: any[];
   success: boolean;
   token: string;
+
   constructor(
     private cookieService: CookieService,
     private config: Config,
     private loginService: LoginService, 
+    private messageService: MessageService,
     private modalService: NgbModal,
 		private parserFormatter: NgbDateParserFormatter,
+    private router: Router,
     private service: DeliveryService,
     private tokenService: TokenService
   ) { 
-    this.token = this.tokenService.getToken();
     this.deliveryTypes = this.config.deliveryTypes;
     this.status = this.config.deliveryStatus;
-    this.service.refresh.subscribe(() => {
-			this.getDeliveries(this.service.params);
-		});
+    this.token = this.tokenService.getToken();
+		this.messageService.display.subscribe((data) => this.messageDisplay(data));
+		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
+		this.service.getData.subscribe((initial) => this.getDeliveries(initial));
   }
 
-  ngOnInit() {
-    this.getDeliveries();
-  }
+  ngOnInit() { this.service.setInitialState() }
 
-  checkDeliveries() {
-    var curObj = {
-      status: <string>'',
-      type: <string>'',
-      dateFrom: <string>'',
-      dateTo: <string>'',
-    };
-    ['currentStatus', 'currentType'].forEach((el) => {
-      if (this[el] !== -1) {
-        let name = el.split('current');
-        let final = name[1].toLowerCase();
-        curObj[final] = this[el];
-      }
-    });
-    ['dateFrom', 'dateTo'].forEach((el) => {
-      if (this[el] !== undefined) {
-        curObj[el] = this[el].year + '-' + this[el].month + '-' + this[el].day;
-      }
-    }); 
-    this.getDeliveries(curObj);
-  }
-  
-  displayMessage(messageType, messageValue, timer, method = null, action = null) {
-		this.messageShow = true;
-		this.messageType = messageType;
-  		this.messageValue = messageValue;
-  		setTimeout(() => { 
-  			this.messageShow = false;
-  			if (method !== null && action !== null) {
-  				this[method][action]();
-  			}
-		}, timer);
-	}
-
-  getDeliveries(params = null) {
+  getDeliveries(init) {
     this.loading = true;
-    this.service.getDeliveries(this.token, params)
-    .subscribe( data => {
-      this.automatic = params !== null ? false : this.automatic;
+    let modelData;
+    if (init) {
+      modelData = this.service.getDeliveries(this.token);
+    } else {
+      modelData = this.service.getCustomDeliveries(this.token, this.service.params);
+    }
+    modelData.subscribe( data => {
+      this.automatic = init;
 			this.handleData(data);
 		});
   }
@@ -113,33 +86,39 @@ export class DeliveryComponent implements OnInit {
   handleSelected(id) {
     if (id === -1) {
         this.selected = 0;
-        this.displayMessage('error', this.config.accountClosed, 3000);
+        this.messageService.setMessage( Message('error', this.config.accountClosed) );
     } else {
         this.selected = this.selected !== id ? id : 0;
     }
   }
 
   logOut() {
-		this.displayMessage('success', this.config.loggedOut, 3000, 'loginService', 'logOut');
-  }
+		this.messageService.setMessage( Message('success', this.config.loggedOut, 'logOut', 'loginService') );
+	}
+
+	messageDisplay(data) {
+		this.messageShow = data.display;
+		this.messageType = data.type;
+  	this.messageValue = data.value;
+	}
   
   open(action) {
-    var final = {
-      action: <string>action,
-      dateTime: <any>{},
+    let final = {
+      action,
+      dateTime: undefined,
       obj: <Delivery>{},
-      status: <any>[],
-      title: <string>'',
-      token: <string>this.token,
-      types: <any>[],
+      status: this.config.deliveryStatus,
+      title: undefined,
+      token: this.token,
+      types: [],
     };
     this.deliveryTypes.forEach((el) => {
+      console.log(el);
       if (el.id !== -1) {
         final.types.push(el);
         final.title = this.config.deliveryTitle[0];
       }
     });
-    final.status = this.config.deliveryStatus;
     if (action === 'add') {
       final.obj.toPrint = -1;
       final.obj.type = -1;
@@ -149,31 +128,29 @@ export class DeliveryComponent implements OnInit {
       var idCheck = this.deliveries.findIndex((el) => { return el.id === this.selected});
       if (idCheck !== -1) {
         final.obj = this.deliveries[idCheck];
-        if (final.obj.documentDate !== undefined) {
-          let splitted = final.obj.documentDate.split('-');
-          final.dateTime = {
-            year: parseInt(splitted[0]),
-            month: parseInt(splitted[1]),
-            day: parseInt(splitted[2])
-          };
-        }
         final.title = this.config.deliveryTitle[1];
+        if (final.obj.documentDate !== undefined) {
+            final.dateTime = SplitDate(final.obj.documentDate);
+        }
       }
     }
     const modalRef = this.modalService.open(DeliveryModal, { windowClass: 'current-modal' });
     modalRef.componentInstance.data = final;
     modalRef.result.then((refresh) => {
 			if (refresh) {
-        this.service.setClear();
-				this.getDeliveries();
+				this.service.setInitialState();
 			}
 	  }, (reason) => {
     });
   }
 
-  refresh() {
-    let curMessage = this.service.getMessage();
-    this.displayMessage(curMessage.type, curMessage.message, 3000);
-    this.getDeliveries();
-  }
+  postMessageAction(data) {
+		if (this[data.object]) {
+			if (data.action === 'navigate') {
+				this.router.navigate(['../login']);
+			} else {
+				this[data.object][data.action]();
+			}
+		}
+	}
 }

@@ -1,11 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { MessageService } from '../../service/message.service';
 import { OrderService } from '../../service/order.service';
 
 import { OrderDetails, Discount } from '../../model/orderDetails';
 import { OrderRow, OrderModifiedRow } from '../../model/orderRow';
 import { Customer } from '../../model/customer';
+import { Message } from '../../shared/functions';
 import { Voucher } from '../../model/voucher';
 
 import { Config } from '../../config';
@@ -46,6 +48,7 @@ export class OrderListComponent implements OnInit {
     private config: Config, 
     private route: ActivatedRoute, 
     private router: Router, 
+    private messageService: MessageService,
     private service: OrderService,
     private tokenService: TokenService
   ) {
@@ -103,10 +106,7 @@ export class OrderListComponent implements OnInit {
                     this.voucher = data.data;
                     this.lastVoucher = data.lastVoucher;
                     if (this.lastVoucher === 0) {
-                      this.service.setMessage({
-                        type: 'error',
-                        text: this.config.emptyVoucher,
-                      });
+                      this.messageService.setMessage( Message('error', this.config.emptyVoucher) );
                     }
                   }
                 });
@@ -129,7 +129,7 @@ export class OrderListComponent implements OnInit {
   }
 
   handleFailure(data) {
-    this.service.setFailure(data);
+    this.messageService.setMessage( Message('error', data.reason) );
   }
 
   goBack() {
@@ -144,8 +144,7 @@ export class OrderListComponent implements OnInit {
       } else {
         var action = this.service.getOrder(this.db, this.id, this.token);
       }
-      action
-          .subscribe( data => {
+      action.subscribe( data => {
             this.searching = false;
             if (data.success === false) {
               this.handleFailure(data);
@@ -199,7 +198,7 @@ export class OrderListComponent implements OnInit {
       db: this.db,
       id: this.id,
       params: params,
-      token: this.token,
+      token: this.token
     };
     this.service.setRequest(curObj);
   }

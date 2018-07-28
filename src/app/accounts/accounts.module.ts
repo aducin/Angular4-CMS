@@ -6,10 +6,10 @@ import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
 
 import { LoginGuard } from '../login.guard';
-
 import { SharedModule } from '../shared/shared.module';
 import { Config } from '../config';
 import { AccountService } from '../service/account.service';
+import { MessageService } from '../service/message.service';
 import { AccountsComponent } from './accounts.component';
 import { AccountHeaderComponent } from './account-header/account-header.component';
 import { AccountListComponent } from './account-list/account-list.component';
@@ -51,7 +51,8 @@ export const accountsRouting = RouterModule.forChild(accountsRoutes);
 	providers: [
 		LoginGuard,
 		Config,
-		AccountService
+		AccountService,
+		MessageService
 	],
 	entryComponents: 
 	[

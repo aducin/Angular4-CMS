@@ -6,18 +6,29 @@ import { Config } from '../config';
 import { Product, NameSearch } from '../model/product';
 
 import { Observable } from 'rxjs/Rx';
+import 'rxjs/Rx';
 import 'rxjs/add/observable/forkJoin';
 
 @Injectable()
 export class ProductService {
-	clear = new EventEmitter();  
-  	headers: Headers;
-	idSearch = new EventEmitter<number>();  
-	nameSearch = new EventEmitter<NameSearch>();  
-  	toRefresh: boolean = false;
-	toSave: boolean = false;
+	clear = new EventEmitter();
+	editionRefresh = new EventEmitter();
+	headers: Headers;
+	idSearch = new EventEmitter<number>();
+	interval: Observable<any>;
+	modyfiedRefresh = new EventEmitter();
+	nameSearch = new EventEmitter<NameSearch>();
+	newestOrders = new EventEmitter<NameSearch>();
+	save = new EventEmitter();
+	timer: number = 360000;
 
-	constructor(private http: Http, private config: Config, private product: Product) {}
+	constructor(
+		private http: Http, 
+		private config: Config, 
+		private product: Product
+	) {
+		this.interval = Observable.interval(this.timer);
+	}
 
 	addPrinting(data) {
 		let formData: FormData = new FormData();
@@ -34,6 +45,24 @@ export class ProductService {
 		.map(res => res.json());
 	}
 
+	deleteAdditional(field, id, token) {
+		let url = this.config.url + 'products/' + field + '/' + id + '/' + token;
+		return this.http.delete(url)
+		.map(res => res.json());
+	}
+
+	deleteNewest(db, id, token) {
+		let url = this.config.url + 'orders/last/' + db + '/' + id + '/' + token;
+		return this.http.get(url)
+		.map(res => res.json());
+	}
+
+	getAdditional(field, token) {
+		let url = this.config.url + 'products/' + field + '/' + token ;
+		return this.http.get(url)
+		.map(res => res.json());
+	}
+
 	getBothLists(): Observable<any> {
 		let urlFirst = this.config.url + 'categories';
 		let urlSecond = this.config.url + 'manufacturers';
@@ -42,7 +71,7 @@ export class ProductService {
 	  	return Observable.forkJoin([categories, manufactorers]);
 	}
 
-	getEdition(id) {
+	getEdition(id: number) {
 		let url = this.config.url + 'products/' + id;
 		return this.http.get(url)
 		.map(res => res.json());
@@ -51,10 +80,14 @@ export class ProductService {
 	getIdSearch(id: number) {
 		let url = this.config.url + 'products/' + id + '?basic=true';
 		return this.http.get(url)
-		.map(res => res.json());
+		.map(res => {
+			let obj = this.setPriceAndDiscount(res.json());
+			obj.imgPath = this.config.serverPath + this.config.imageSuffix + obj.id + '-' + obj.image + '-thickbox.jpg';
+			return obj;
+		});
 	}
 
-	getHistory(id) {
+	getHistory(id: number) {
 		let url = this.config.url + 'products/' + id + '/history';
 		return this.http.get(url)
 		.map(res => res.json());
@@ -66,40 +99,14 @@ export class ProductService {
 		.map(res => res.json());
 	}
 
-	deleteNewest(db, id, token) {
-		let url = this.config.url + 'orders/last/' + db + '/' + id + '/' + token;
-		return this.http.get(url)
-			.map(res => res.json());
-	}
-
-	getNewestOrders(token) {
+	getNewestOrders(token: string) {
 		let url = this.config.url + 'orders/last/' + token;
-		return this.http.get(url)
-			.map(res => res.json());
-	}
-
-	deleteAdditional(field, id, token) {
-		let url = this.config.url + 'products/' + field + '/' + id + '/' + token;
-		return this.http.delete(url)
-		.map(res => res.json());
-	}
-
-	getAdditional(field, token) {
-		let url = this.config.url + 'products/' + field + '/' + token ;
 		return this.http.get(url)
 		.map(res => res.json());
 	}
 
 	getProduct() {
 		return this.product;
-	}
-
-	getToRefresh() {
-		return this.toRefresh;
-	}
-
-	getToSave() {
-		return this.toSave;
 	}
 
 	setClear() {
@@ -114,14 +121,45 @@ export class ProductService {
 		this.nameSearch.emit(obj);
 	}
 
-	setProduct(obj) {
-		this.product = obj;
-		this.toSave = true;
+	setPriceAndDiscount(obj) {
+		obj.priceBlock = obj.discount.new || !obj.discount.old;
+		obj.priceReal = {
+			new: obj.price.new,
+			old: obj.price.old,
+		};
+		if (obj.discount.new || !obj.discount.old) {
+			var discountValue = 0;
+			if (obj.discount.new.reduction !== undefined) {
+				if (obj.discount.new.reductionType === 'amount') {
+					obj.priceReal.new = Math.round((obj.price.new - obj.discount.new.reduction) * 100) / 100;
+				} else if (obj.discount.new.reductionType === 'percentage') {
+					let curAmount = obj.price.new * (obj.discount.new.reduction / 100);
+					obj.priceReal.new = Math.round((obj.price.new - curAmount) * 100) / 100;
+				}
+				discountValue++;
+			}
+			if (obj.discount.old.reduction !== undefined) {
+				if (obj.discount.old.reductionType === 'amount') {
+					obj.priceReal.old = Math.round((obj.price.old - obj.discount.old.reduction) * 100) / 100;
+				} else if (obj.discount.old.reductionType === 'percentage') {
+					let curAmount = obj.price.old * (obj.discount.old.reduction / 100);
+					obj.priceReal.old = Math.round((obj.price.old - curAmount) * 100) / 100;
+				}
+				discountValue++;
+			}
+			obj.discountValue = discountValue;
+		}
+		return obj;
 	}
 
-	setRefresh(bool) {
-		this.toRefresh = bool;
-		this.toSave = false;
+	setProductSave(obj) {
+		this.product = obj;
+		this.save.emit();
+	}
+
+	setRefresh() {
+		this.editionRefresh.emit();
+		this.modyfiedRefresh.emit();
 	}
 
 	updateProduct(data) {

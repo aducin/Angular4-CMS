@@ -8,16 +8,9 @@ import { Observable } from 'rxjs/Rx';
 @Injectable()
 export class DeliveryService {
   clear = new EventEmitter();
+  getData = new EventEmitter<boolean>();
   headers: Headers;
-  message: string;
-  params: {
-    status: string,
-    type: string,
-    dateFrom: string,
-    dateTo: string
-  };
-  refresh = new EventEmitter();
-  type: string;
+  params: {key: string, value: any}[];
 
   constructor(private http:Http, private config: Config) {
     this.headers = new Headers();
@@ -37,51 +30,42 @@ export class DeliveryService {
 		.map(res => res.json());
   }
 
-  getDeliveries(token, params) {
-    var url = this.config.url + 'deliveries/' + token;
-    if (params !== null) {
-      url = url + '?status=' + params.status + '&type=' + params.type + '&dateFrom=' + params.dateFrom + '&dateTo=' + params.dateTo;
-    }
-    return this.http.get(url)
+  getCustomDeliveries(token, params) {
+    const url = this.config.url + 'deliveries/' + token;
+    const finalParams = params.reduce((obj, single) => {
+      obj[single.key] = single.value;
+      return obj;
+    }, {});
+    return this.http.get(url, {params: finalParams})
     .map(res => res.json());
   }
 
-  getMessage() {
-    let response = {
-      message: <string>this.message,
-      type: <string>this.type,
-    };
-    return response;
-  }
-
-  setClear() {
-    this.clear.emit();
+  getDeliveries(token) {
+    const url = this.config.url + 'deliveries/' + token;
+    return this.http.get(url)
+    .map(res => res.json());
   }
 
   setDeliveries(data, method, token) {
   	let options = new RequestOptions({ headers: this.headers });
     let url = this.config.url + 'delivery/' + token;
+    let promise;
     if (method === 1) {
-      var promise = this.http.post(url, data, this.headers);
+      promise = this.http.post(url, data, this.headers);
     } else {
-      var promise = this.http.put(url, data, this.headers);
+      promise = this.http.put(url, data, this.headers);
     }
     return promise
   	.map(res => res.json());
   }
-  
-  setMessage(type, message) {
-    this.type = type;
-    this.message = message;
+
+  setInitialState() {
+    this.clear.emit();
+    this.getData.emit(true);
   }
 
-  setParams(data: {
-    status: string,
-    type: string,
-    dateFrom: string,
-    dateTo: string
-  }) {
+  setParams(data: {key: string, value: any}[]) {
     this.params = data;
-    this.refresh.emit();
+    this.getData.emit(false);
   }
 }

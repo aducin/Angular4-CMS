@@ -18,8 +18,8 @@
 				[idSearchInProgress]="idSearchInProgress"
 				[inputDisabled]="inputDisabled"
 				[manufactorer]="manufactorer"
-				[searchInProgress]="searchInProgress"
-			></product-header>
+				[searchInProgress]="searchInProgress">
+			</product-header>
 		</div>
 		<div class="col-sm-12 col-md-2 col-xl-3 pull-left"></div>
 		<div *ngIf="children" class="paddingBottom2">
@@ -61,7 +61,7 @@
 				[emptySearch]="emptySearch" 
 				[productList]="productList" 
 				[url]="url" 
-				[imagePath]="imagePath" 
+				[imagePath]="config.imageSuffix"
 				[listLength]="listLength"
 				[searchInProgress]="searchInProgress">
 			 </product-list>

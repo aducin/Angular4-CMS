@@ -3,15 +3,16 @@ import { Http } from '@angular/http';
 import { Router } from '@angular/router';
 
 import { CookieService } from 'ngx-cookie';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Postal } from '../model/postal';
-import { PostalService } from '../service/postal.service';
-import { TokenService } from '../service/token.service';
-import { LoginService } from '../service/login.service';
-import { Config } from '../config';
-
 import { PostalModal } from '../modal/postal.modal.component';
+import { PostalService } from '../service/postal.service';
+import { LoginService } from '../service/login.service';
+import { MessageService } from '../service/message.service';
+import { TokenService } from '../service/token.service';
+import { Config } from '../config';
+import { Message } from '../shared/functions';
 
 @Component({
   	selector: 'app-postal',
@@ -19,13 +20,8 @@ import { PostalModal } from '../modal/postal.modal.component';
     styleUrls: ['./postal.component.css'],
     encapsulation: ViewEncapsulation.None,
     styles: [`
-      .current-modal {
-        position: fixed;
-        top: 10%;
-      }
-      .modal-content {
-        width: 120%;
-      }`
+      .current-modal { position: fixed; top: 10% }
+      .modal-content { width: 120% }`
     ]
 })
 export class PostalComponent implements OnInit {
@@ -42,17 +38,19 @@ export class PostalComponent implements OnInit {
         private cookieService: CookieService,
         private loginService: LoginService,
         private config: Config,
+        private messageService: MessageService,
         private modalService: NgbModal,
         private router: Router,
         private service: PostalService,
         private tokenService: TokenService
     ) {
       this.token = this.tokenService.getToken();
+      this.messageService.display.subscribe((data) => this.messageDisplay(data));
+		  this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
+      this.service.refresh.subscribe(() => this.getPostal());
     }
 
-  ngOnInit() {
-  	this.getPostal();
-  }
+  ngOnInit() { this.getPostal() }
 
   displayMessage(messageType, messageValue, timer, method = null, action = null) {
 		this.messageShow = true;
@@ -75,40 +73,51 @@ export class PostalComponent implements OnInit {
             this.amount = data.current;
             this.loading = false;
         } else {
-            this.messageShow = true;
-            this.messageType = 'error';
-            this.messageValue = data.reason;
-            setTimeout(() => {
-                this.router.navigate(['../login']);
-            }, 3000);
+            this.messageService.setMessage( Message('error', data.reason, 'router', 'navigate') );
         }
     });
   }
 
   logOut() {
-		this.displayMessage('success', this.config.loggedOut, this.config.timer, 'loginService', 'logOut');
+		this.messageService.setMessage( Message('success', this.config.loggedOut, 'logOut', 'loginService') );
+	}
+
+	messageDisplay(data) {
+		this.messageShow = data.display;
+		this.messageType = data.type;
+  	this.messageValue = data.value;
 	}
 
   open(action) {
     let data = {
-      action: <string>action,
-      amount: <number>this.amount,
-      amountOriginal: <number>this.amount,
-      error: <boolean>false,
-      message: <string>'',
-      newAmount: <number>0,
-      saveAllow: <boolean>false,
-      success: <boolean>false,
+      action,
+      amount: this.amount,
+      amountOriginal: this.amount,
+      error: false,
+      message: undefined,
+      newAmount: 0,
+      saveAllow: false,
+      success: false,
       token: this.token,
-      title: action === 'add' ? this.config.postalActions[0] : this.config.postalActions[1],
+      title: action === 'add' ? this.config.postalActions[0] : this.config.postalActions[1]
     };
     const modalRef = this.modalService.open(PostalModal, { windowClass: 'current-modal' });
     modalRef.componentInstance.data = data;
     modalRef.result.then((refresh) => {
       if (refresh) {
-        this.getPostal();
+        this.service.setRefresh();
       }
     }, (reason) => {
     });
   }
+
+  postMessageAction(data) {
+		if (this[data.object]) {
+			if (data.action === 'navigate') {
+				this.router.navigate(['../login']);
+			} else {
+				this[data.object][data.action]();
+			}
+		}
+	}
 }

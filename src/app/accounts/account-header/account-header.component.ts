@@ -37,7 +37,7 @@ export class AccountHeaderComponent {
     }
 
     checkAccounts() {
-		var data = [];
+		let data = [];
 		if (this.currentState !== -1) {
 			data.push( {
 				key: 'state',

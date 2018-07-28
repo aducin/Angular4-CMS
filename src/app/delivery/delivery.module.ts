@@ -9,6 +9,7 @@ import { LoginGuard } from '../login.guard';
 
 import { SharedModule } from '../shared/shared.module';
 import { DeliveryService } from '../service/delivery.service';
+import { MessageService } from '../service/message.service';
 import { Config } from '../config';
 
 import { DeliveryComponent } from './delivery.component';
@@ -53,6 +54,7 @@ export const deliveryRouting = RouterModule.forChild(deliveryRoutes);
   ],
   providers: [
     DeliveryService,
+    MessageService,
 		LoginGuard,
 		Config
   ],

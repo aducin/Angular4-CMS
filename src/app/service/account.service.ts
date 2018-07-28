@@ -7,9 +7,9 @@ import { GetTime } from '../shared/functions';
 @Injectable()
 export class AccountService {
   clear = new EventEmitter();
+  getData = new EventEmitter<boolean>();
   headers: Headers;
   params: any[];
-  refresh = new EventEmitter();
 
   constructor(private http:Http, private config: Config) {
     this.headers = new Headers();
@@ -101,12 +101,13 @@ export class AccountService {
   	.map(res => res.json());
 	}
 
-  setClear() {
+  setInitialState() {
     this.clear.emit();
+    this.getData.emit(true);
   }
 
   setParams(data: any[]) {
     this.params = data;
-    this.refresh.emit();
+    this.getData.emit(false);
   }
 }

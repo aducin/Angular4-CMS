@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
 
 import { Config } from '../config';
 
 @Injectable()
 export class PostalService {
-	
 	headers: Headers;
+	refresh = new EventEmitter();
+
 	constructor(private http:Http, private config: Config) {
 		this.headers = new Headers();
 		this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -24,5 +25,9 @@ export class PostalService {
 		let url = this.config.url + 'postal';
     	return this.http.put(url, data, this.headers)
     	.map(res => res.json());
+	}
+
+	setRefresh() {
+		this.refresh.emit();
 	}
 }

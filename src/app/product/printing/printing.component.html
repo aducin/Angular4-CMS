@@ -6,11 +6,11 @@
 			<h3>Proszę czekać - wyszukiwanie dokumentów do wydruku...</h3>
 			<ngx-loading [show]="printingSearch" [config]="{ backdropBorderRadius: '8px'}"></ngx-loading>
 		</div>
-		<div *ngIf="printingEmpty && !printingSearch" class="col-sm-12 pull-left paddingBottom20px">
-			<div class="col-sm-11 pull-left">
+		<div *ngIf="printingEmpty && !printingSearch" class="col-sm-12 pull-left paddingTop10px paddingBottom20px">
+			<div class="pull-left">
 				<h3>Obecnie brak dokumentow do wydruku.</h3>
 			</div>
-			<div class="col-sm-1 pull-left">
+			<div class="col-sm-1 pull-right">
 				<ng4-files-click (filesSelect)="filesUpload($event)">
 					<!--<span role="button" class="btn btn-primary">Dodaj dokument</span>-->
 					<span class="btn cursorPointer" ngbTooltip="Dodaj dokument"><i class="fa fa-print" aria-hidden="true"></i></span>

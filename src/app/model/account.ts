@@ -1,3 +1,5 @@
+import { Config } from '../config';
+
 export class Account {
 	accessories: number;
     address: string;
@@ -19,4 +21,17 @@ export class Account {
     recipient: string;
     type: number;
     typeName: string;
+}
+
+export class Totals {
+    amount: number;
+    amountIt: number;
+    locs: number;
+    coach: number;
+    element: number;
+    accessories: number;
+    book: number;
+    car: number;
+    tax: number;
+    taxIt: number;
 }

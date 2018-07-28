@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
 import { HttpParams, HttpClient } from '@angular/common/http';
 
@@ -6,11 +6,9 @@ import { Config } from '../config';
 
 @Injectable()
 export class OrderService {
+  	headers: Headers;
+	request = new EventEmitter<{db: string, id: number, params: any, token: string}>();
 
-  headers: Headers;
-	failure: any = null;
-	message: any = null;
-	request: any = null;
 	constructor(private http:Http, private httpClient: HttpClient, private config: Config) {
 		this.headers = new Headers();
 		this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -41,16 +39,8 @@ export class OrderService {
 		.map(res => res.json());
   	}
 
-	setFailure(obj) {
-		this.failure = obj;
-	}
-
-	setMessage(obj) {
-		this.message = obj;
-	}
-
-	setRequest(obj) {
-		this.request = obj;
+	setRequest(obj: {db: string, id: number, params: any, token: string}) {
+		this.request.emit(obj);
 	}
 
 	sendMail(data) {

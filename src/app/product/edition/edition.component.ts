@@ -30,7 +30,9 @@ export class EditionComponent implements OnInit {
 		private product: Product, 
 		private router: Router, 
 		private config: Config
-	) { }
+	) { 
+		this.service.editionRefresh.subscribe(() => this.getData());
+	}
 
 	ngOnInit() {
 		this.id = this.route.snapshot.params.id;
@@ -49,13 +51,6 @@ export class EditionComponent implements OnInit {
 		this.condition = this.config.condition;
 		this.getData();
 	}
-
-	ngDoCheck() {
-		if (this.service.getToRefresh()) {
-			this.service.setRefresh(false);
-			this.getData();
-		}
-	}	
 
 	categoryHover() {
 		this.cursor = true;
@@ -110,7 +105,7 @@ export class EditionComponent implements OnInit {
 
 	save() {
 		this.inputDisabled = true;
-		this.service.setProduct(this.product);
+		this.service.setProductSave(this.product);
 	}
 
 	saveAllow() {
