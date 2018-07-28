@@ -261,12 +261,9 @@ export class ProductComponent implements OnInit {
 	}
 
 	saveProduct(obj) {
-		let curObj = {...obj};
-		curObj.action = 'full';
-		curObj.db = 'both';
+		let curObj = {...obj, action: 'full', db: 'both', productCategories: []};
 		curObj.quantity = parseInt(obj.quantityBoth);
 		curObj.productTags = obj.tagString;
-		curObj.productCategories = [];
 		obj.categories.forEach(el => {
 			if (el.checked) { curObj.productCategories.push(el.id); }
 		});
