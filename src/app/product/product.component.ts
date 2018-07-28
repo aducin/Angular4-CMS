@@ -83,7 +83,7 @@ export class ProductComponent implements OnInit {
 		this.messageService.display.subscribe((data) => this.messageDisplay(data));
 		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
 		this.service.idSearch.subscribe((id: number) => this.idSearch(id));
-		this.service.modyfiedRefresh.subscribe(() => this.getModified());
+		this.service.modifiedRefresh.subscribe(() => this.getModified());
 		this.service.nameSearch.subscribe((dataObj: NameSearch) => this.nameSearch(dataObj));
 		this.service.save.subscribe(() => this.saveProduct(this.service.getProduct()));
 		this.subscription = this.service.interval.subscribe( () => this.getNewestOrders() );

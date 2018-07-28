@@ -47,5 +47,7 @@ export class Config {
 	postalActions: string[] = ['Dodaj środki', 'Odejmij środki'];
 	searchInterval: number = 1000;
 	timer: number = 3000;
+	typeIt: number = 3;
+	typeReturn: number = 5;
 	waiting: string = 'Proszę czekać';
 }

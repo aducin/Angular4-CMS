@@ -11,7 +11,10 @@ export class AccountService {
   headers: Headers;
   params: any[];
 
-  constructor(private http:Http, private config: Config) {
+  constructor(
+    private http:Http, 
+    private config: Config
+  ) {
     this.headers = new Headers();
     this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
     this.headers.append('Access-Control-Allow-Origin', '*');
@@ -29,9 +32,9 @@ export class AccountService {
       newObj.list = obj.list.map((el) => {
         el.amountFloat = parseFloat(el.amount);
         if (el.closed) {
-          if (el.type === 3) {
+          if (el.type === this.config.typeIt) {
             newObj.totals.amountIt += el.amountFloat;
-          } else if (el.type !== 5) {
+          } else if (el.type !== this.config.typeReturn) {
             newObj.totals.amount += el.amountFloat;
           } else {
             newObj.totals.amount -= el.amountFloat;
@@ -63,10 +66,7 @@ export class AccountService {
   getAccounts(token) {
     let url = this.config.url + 'accounts/' + token;
     return this.http.get(url)
-    .map(res => {
-      let response = this.handleAmounts(res.json());
-      return response;
-    });
+    .map(res => this.handleAmounts(res.json()));
   }
 
   getCustomAccounts(token, params) {
@@ -76,10 +76,7 @@ export class AccountService {
       return obj;
     }, {});
     return this.http.get(url, {params: finalParams})
-    .map(res => {
-      let response = this.handleAmounts(res.json());
-      return response;
-    });
+    .map(res => this.handleAmounts(res.json()));
   }
 
   modifyAccount(data) {

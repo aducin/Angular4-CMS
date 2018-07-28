@@ -16,7 +16,7 @@ export class ProductService {
 	headers: Headers;
 	idSearch = new EventEmitter<number>();
 	interval: Observable<any>;
-	modyfiedRefresh = new EventEmitter();
+	modifiedRefresh = new EventEmitter();
 	nameSearch = new EventEmitter<NameSearch>();
 	newestOrders = new EventEmitter<NameSearch>();
 	save = new EventEmitter();
@@ -159,7 +159,7 @@ export class ProductService {
 
 	setRefresh() {
 		this.editionRefresh.emit();
-		this.modyfiedRefresh.emit();
+		this.modifiedRefresh.emit();
 	}
 
 	updateProduct(data) {
