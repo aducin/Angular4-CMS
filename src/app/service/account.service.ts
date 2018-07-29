@@ -82,7 +82,7 @@ export class AccountService {
       return obj;
     }, {});
     let data = this.http.get(url, {params: finalParams})
-    .map(res => this.handleAmounts(res.json()));
+    .map(res => this.handleAmounts(res.json()))
     this.dataEmitter.emit(data);
   }
 
@@ -97,11 +97,11 @@ export class AccountService {
   	let options = new RequestOptions({ headers: this.headers });
     const url = this.config.url + 'accounts/' + token;
     if (method === 1) {
-      var promise = this.http.post(url, data, this.headers);
+      var result = this.http.post(url, data, this.headers);
     } else {
-      var promise = this.http.put(url, data, this.headers);
+      var result = this.http.put(url, data, this.headers);
     }
-    return promise
+    return result
   	.map(res => res.json());
 	}
 

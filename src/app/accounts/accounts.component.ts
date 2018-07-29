@@ -48,9 +48,9 @@ export class AccountsComponent implements OnInit {
 	) {
 		this.messageService.display.subscribe((data) => this.messageDisplay(data));
 		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
-		this.service.dataEmitter.subscribe((observable) => {
-			observable.subscribe((data => this.handleData(data)));
-		});
+		this.service.dataEmitter
+		.switchMap(observable => observable)
+		.subscribe((data) => this.handleData(data));
 		this.service.loading.subscribe(() => this.loading = true);
 	}
 

@@ -42,8 +42,9 @@ export class DeliveryService {
 
   getDeliveries(token) {
     const url = this.config.url + 'deliveries/' + token;
-    return this.http.get(url)
+    let data = this.http.get(url)
     .map(res => res.json());
+    return data;
   }
 
   setDeliveries(data, method, token) {
