@@ -45,10 +45,11 @@ export class AccountModal {
 			});
 			var empty = 0;
 			['cashTime', 'receiptTime'].forEach((el) => {
-				if (this.data[el].year === undefined) {
+				if (!this.data[el] || this.data[el].year === undefined) {
 					empty++;
 				}
-			});	
+			});
+			console.log(empty);	
 			if (empty === 2) {
 				this.data.saveAllow = false;
 			}

@@ -1,7 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { CookieService } from 'ngx-cookie';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { AccountService } from '../service/account.service';
@@ -41,7 +39,6 @@ export class AccountsComponent implements OnInit {
 	totals = Totals;
 	constructor(
 		private config: Config,
-		private cookieService: CookieService,
 		private loginService: LoginService,
 		private messageService: MessageService,
 		private modalService: NgbModal,
@@ -60,27 +57,27 @@ export class AccountsComponent implements OnInit {
 		 this.service.setInitialState(); 
 		}
 
-	handleData(data) {
-		this.success = data.success;
-        this.loading = false;
-		if (data.success) {
-			this.empty = Boolean(data.empty);
-			if (!data.empty) {
-				this.config.accountList.forEach( el => this[el] = data[el] );
-			}
-		} else {
-			this.messageService.setMessage( Message('error', data.reason, 'router', 'navigate') );
-        }
+handleData(data) {
+	this.success = data.success;
+	this.loading = false;
+	if (data.success) {
+		this.empty = Boolean(data.empty);
+		if (!data.empty) {
+			this.config.accountList.forEach( el => this[el] = data[el] );
+		}
+	} else {
+		this.messageService.setMessage( Message('error', data.reason, 'router', 'navigate') );
 	}
+}
 
-	handleSelected(id) {
-        if (id === -1) {
-            this.selected = 0;
-			this.messageService.setMessage( Message('error', this.config.accountClosed) );
-        } else {
-            this.selected = this.selected !== id ? id : 0;
-        }
+handleSelected(id) {
+	if (id === -1) {
+		this.selected = 0;
+		this.messageService.setMessage( Message('error', this.config.accountClosed) );
+	} else {
+		this.selected = this.selected !== id ? id : 0;
 	}
+}
 
 	logOut() {
 		this.messageService.setMessage( Message('success', this.config.loggedOut, 'logOut', 'loginService') );
