@@ -2,32 +2,37 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
 
 import { Config } from '../config';
+import { TokenService } from '../service/token.service';
 
 @Injectable()
 export class PostalService {
 	headers: Headers;
-	refresh = new EventEmitter();
+	dataEmitter = new EventEmitter<any>();
+	loading = new EventEmitter();
+	token: string;
 
-	constructor(private http:Http, private config: Config) {
+	constructor(
+		private http:Http, 
+		private config: Config,
+		private tokenService: TokenService
+	) {
 		this.headers = new Headers();
 		this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
 		this.headers.append('Access-Control-Allow-Origin', '*');
 	}
 	
-	getList(token) {
-		let url = this.config.url + 'postal/' + token;
-		return this.http.get(url)
+	getList() {
+		this.loading.emit();
+		const url = this.config.url + 'postal/' + this.tokenService.getToken();
+		let data = this.http.get(url)
 		.map(res => res.json());
+		this.dataEmitter.emit(data);
 	}
 
 	setPostal(data) {
-  		let options = new RequestOptions({ headers: this.headers });
-		let url = this.config.url + 'postal';
+  		const options = new RequestOptions({ headers: this.headers });
+		const url = this.config.url + 'postal';
     	return this.http.put(url, data, this.headers)
     	.map(res => res.json());
-	}
-
-	setRefresh() {
-		this.refresh.emit();
 	}
 }

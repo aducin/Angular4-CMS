@@ -3,16 +3,24 @@ import { Http, Headers, RequestOptions } from "@angular/http";
 import { HttpParams, HttpClient } from '@angular/common/http';
 
 import { Config } from '../config';
+import { TokenService } from '../service/token.service';
 
 @Injectable()
 export class OrderService {
   	headers: Headers;
 	request = new EventEmitter<{db: string, id: number, params: any, token: string}>();
+	token: string;
 
-	constructor(private http:Http, private httpClient: HttpClient, private config: Config) {
+	constructor(
+		private http:Http, 
+		private httpClient: HttpClient, 
+		private config: Config,
+		private tokenService: TokenService
+	) {
 		this.headers = new Headers();
 		this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
 		this.headers.append('Access-Control-Allow-Origin', '*');
+		this.token = this.tokenService.getToken();
 	}
 
 	checkVouchers(id, token) {

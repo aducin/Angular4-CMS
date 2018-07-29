@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router';
 
-import { CookieService } from 'ngx-cookie';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Postal } from '../model/postal';
@@ -35,22 +34,23 @@ export class PostalComponent implements OnInit {
   self: string = 'postal';
   token: string;
 	constructor(
-        private cookieService: CookieService,
-        private loginService: LoginService,
-        private config: Config,
-        private messageService: MessageService,
-        private modalService: NgbModal,
-        private router: Router,
-        private service: PostalService,
-        private tokenService: TokenService
-    ) {
-      this.token = this.tokenService.getToken();
-      this.messageService.display.subscribe((data) => this.messageDisplay(data));
-		  this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
-      this.service.refresh.subscribe(() => this.getPostal());
-    }
+    private loginService: LoginService,
+    private config: Config,
+    private messageService: MessageService,
+    private modalService: NgbModal,
+    private router: Router,
+    private service: PostalService,
+    private tokenService: TokenService
+  ) {
+    this.messageService.display.subscribe((data) => this.messageDisplay(data));
+		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
+    this.service.loading.subscribe( () => this.loading = true );
+    this.service.dataEmitter
+		.switchMap(observable => observable)
+		.subscribe((data) => this.handleData(data));
+  }
 
-  ngOnInit() { this.getPostal() }
+  ngOnInit() { this.service.getList() }
 
   displayMessage(messageType, messageValue, timer, method = null, action = null) {
 		this.messageShow = true;
@@ -64,18 +64,14 @@ export class PostalComponent implements OnInit {
 		}, timer);
 	}
 
-  getPostal() {
-    this.loading = true;
-    this.service.getList(this.token)
-    .subscribe( data => {
-        if (data.success) {
-            this.list = data.list;
-            this.amount = data.current;
-            this.loading = false;
-        } else {
-            this.messageService.setMessage( Message('error', data.reason, 'router', 'navigate') );
-        }
-    });
+  handleData(data) {
+    this.loading = false;
+    if (data.success) {
+      this.list = data.list;
+      this.amount = data.current;
+    } else {
+      this.messageService.setMessage( Message('error', data.reason, 'router', 'navigate') );
+    }
   }
 
   logOut() {
@@ -98,14 +94,14 @@ export class PostalComponent implements OnInit {
       newAmount: 0,
       saveAllow: false,
       success: false,
-      token: this.token,
+      token: this.tokenService.getToken(),
       title: action === 'add' ? this.config.postalActions[0] : this.config.postalActions[1]
     };
     const modalRef = this.modalService.open(PostalModal, { windowClass: 'current-modal' });
     modalRef.componentInstance.data = data;
     modalRef.result.then((refresh) => {
       if (refresh) {
-        this.service.setRefresh();
+        this.service.getList();
       }
     }, (reason) => {
     });
