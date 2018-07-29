@@ -1,23 +1,26 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
 
+import { TokenService } from '../service/token.service';
 import { Config } from '../config';
 import { GetTime } from '../shared/functions';
 
 @Injectable()
 export class AccountService {
   clear = new EventEmitter();
-  getData = new EventEmitter<boolean>();
+  dataEmitter = new EventEmitter<any>();
   headers: Headers;
-  params: any[];
+  token: string;
 
   constructor(
     private http:Http, 
-    private config: Config
+    private config: Config,
+    private tokenService: TokenService
   ) {
     this.headers = new Headers();
     this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
     this.headers.append('Access-Control-Allow-Origin', '*');
+    this.token = this.tokenService.getToken();
   }
 
   handleAmounts(obj) {
@@ -63,20 +66,22 @@ export class AccountService {
     el.createTimestamp = GetTime(el.createTime);
   }
 
-  getAccounts(token) {
-    let url = this.config.url + 'accounts/' + token;
-    return this.http.get(url)
+  getAccounts() {
+    let url = this.config.url + 'accounts/' + this.token;
+    let data = this.http.get(url)
     .map(res => this.handleAmounts(res.json()));
+    this.dataEmitter.emit(data);
   }
 
-  getCustomAccounts(token, params) {
-    const url = this.config.url + 'accounts/' + token;
+  getCustomAccounts(params: any) {
+    const url = this.config.url + 'accounts/' + this.token;
     const finalParams = params.reduce((obj, single) => {
       obj[single.key] = single.value;
       return obj;
     }, {});
-    return this.http.get(url, {params: finalParams})
+    let data = this.http.get(url, {params: finalParams})
     .map(res => this.handleAmounts(res.json()));
+    this.dataEmitter.emit(data);
   }
 
   modifyAccount(data) {
@@ -100,11 +105,6 @@ export class AccountService {
 
   setInitialState() {
     this.clear.emit();
-    this.getData.emit(true);
-  }
-
-  setParams(data: any[]) {
-    this.params = data;
-    this.getData.emit(false);
+    this.getAccounts();
   }
 }

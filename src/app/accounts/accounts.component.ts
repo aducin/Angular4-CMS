@@ -38,7 +38,6 @@ export class AccountsComponent implements OnInit {
 	self: string = 'accounts';
 	success: boolean;
 	toCount: string[] = ['locs', 'coach', 'element', 'accessories', 'book', 'car'];
-	token: string;
 	totals = Totals;
 	constructor(
 		private config: Config,
@@ -48,28 +47,18 @@ export class AccountsComponent implements OnInit {
 		private modalService: NgbModal,
 		private router: Router,
 		private service: AccountService,
-		private tokenService: TokenService,
+		private tokenService: TokenService
 	) {
-		this.token = this.tokenService.getToken();
 		this.messageService.display.subscribe((data) => this.messageDisplay(data));
 		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
-		this.service.getData.subscribe((initial) => this.getAccounts(initial));
-	}
-
- 	ngOnInit() { this.service.setInitialState() }
-
-	getAccounts(init) {
-		this.loading = true;
-		let accountData;
-		if (init) {
-			accountData = this.service.getAccounts(this.token);
-		} else {
-			accountData = this.service.getCustomAccounts(this.token, this.service.params);
-		}
-		accountData.subscribe(data => {
-			this.handleData(data);
+		this.service.dataEmitter.subscribe((observable) => {
+			observable.subscribe((data => this.handleData(data)));
 		});
 	}
+
+ 	ngOnInit() { 
+		 this.service.setInitialState(); 
+		}
 
 	handleData(data) {
 		this.success = data.success;
@@ -110,7 +99,7 @@ export class AccountsComponent implements OnInit {
             saveAllow: false,
             state: this.config.accountState,
 			title: undefined,
-			token: this.token,
+			token: this.tokenService.getToken(),
             type: this.config.accountType,
             cashTime: undefined,
             receiptTime: undefined

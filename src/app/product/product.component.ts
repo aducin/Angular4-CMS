@@ -222,7 +222,7 @@ export class ProductComponent implements OnInit {
 	messageDisplay(data) {
 		this.messageShow = data.display;
 		this.messageType = data.type;
-  		this.messageValue = data.value;
+		this.messageValue = data.value;
 	}
 
 	nameSearch(obj) {

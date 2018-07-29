@@ -62,7 +62,7 @@ export class AccountHeaderComponent {
 				value: this.parserFormatter.format(this.dateTo)
 			});
 		}
-		this.service.setParams(data);
+		this.service.getCustomAccounts(data);
 	}
 
 	clearHeader() {
