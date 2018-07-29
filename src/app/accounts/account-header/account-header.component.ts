@@ -27,10 +27,7 @@ export class AccountHeaderComponent {
         private parserFormatter: NgbDateParserFormatter,
 		private service: AccountService
     ) {
-        this.accountState = this.config.accountState;
-        this.accountState.unshift(this.config.chooseAll);
-		this.accountType = this.config.accountType;
-        this.accountType.unshift(this.config.chooseAll);
+        this.setLists();
 		this.service.clear.subscribe(() => this.clearHeader());
     }
 
@@ -84,5 +81,12 @@ export class AccountHeaderComponent {
 		if (typeCheck === -1) {
 			this.accountType.unshift(this.config.choose);
 		}
+	}
+	
+	setLists() {
+		this.accountState = [...this.config.accountState];
+        this.accountState.unshift(this.config.chooseAll);
+		this.accountType = [...this.config.accountType];
+        this.accountType.unshift(this.config.chooseAll);
 	}
 }

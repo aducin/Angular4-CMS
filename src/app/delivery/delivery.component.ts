@@ -48,7 +48,7 @@ export class DeliveryComponent implements OnInit {
     private router: Router,
     private service: DeliveryService,
     private tokenService: TokenService
-  ) { 
+  ) {
     this.deliveryTypes = this.config.deliveryTypes;
     this.status = this.config.deliveryStatus;
     this.token = this.tokenService.getToken();
@@ -102,7 +102,6 @@ export class DeliveryComponent implements OnInit {
       types: [],
     };
     this.deliveryTypes.forEach((el) => {
-      console.log(el);
       if (el.id !== -1) {
         final.types.push(el);
         final.title = this.config.deliveryTitle[0];

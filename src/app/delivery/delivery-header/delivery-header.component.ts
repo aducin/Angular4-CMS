@@ -26,14 +26,8 @@ export class DeliveryHeaderComponent {
         private parserFormatter: NgbDateParserFormatter,
         private service: DeliveryService
     ) {
-        this.deliveryTypes = this.config.deliveryTypes;
-        this.deliveryTypes.unshift(this.config.chooseAll); 
-        this.status = this.config.deliveryStatus;
-        this.status.unshift(this.config.chooseAll); 
-        this.setEmpties();
-        this.service.clear.subscribe(() => {
-			this.clearHeader();
-		});
+		this.setLists();
+        this.service.clear.subscribe(() => this.clearHeader());
     }
 
     clearHeader() {
@@ -86,5 +80,12 @@ export class DeliveryHeaderComponent {
 		if (statusCheck === -1) {
 			this.status.unshift(this.config.chooseAll);
 		}
+	}
+
+	setLists() {
+		this.deliveryTypes = [...this.config.deliveryTypes];
+		this.deliveryTypes.unshift(this.config.chooseAll); 
+		this.status = [...this.config.deliveryStatus];
+		this.status.unshift(this.config.chooseAll);
 	}
 }
