@@ -31,9 +31,7 @@ export class AccountHeaderComponent {
         this.accountState.unshift(this.config.chooseAll);
 		this.accountType = this.config.accountType;
         this.accountType.unshift(this.config.chooseAll);
-		this.service.clear.subscribe(() => {
-			this.clearHeader();
-		});
+		this.service.clear.subscribe(() => this.clearHeader());
     }
 
     checkAccounts() {

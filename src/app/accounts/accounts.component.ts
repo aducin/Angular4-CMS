@@ -51,33 +51,34 @@ export class AccountsComponent implements OnInit {
 		this.service.dataEmitter.subscribe((observable) => {
 			observable.subscribe((data => this.handleData(data)));
 		});
+		this.service.loading.subscribe(() => this.loading = true);
 	}
 
  	ngOnInit() { 
 		 this.service.setInitialState(); 
-		}
-
-handleData(data) {
-	this.success = data.success;
-	this.loading = false;
-	if (data.success) {
-		this.empty = Boolean(data.empty);
-		if (!data.empty) {
-			this.config.accountList.forEach( el => this[el] = data[el] );
-		}
-	} else {
-		this.messageService.setMessage( Message('error', data.reason, 'router', 'navigate') );
 	}
-}
 
-handleSelected(id) {
-	if (id === -1) {
-		this.selected = 0;
-		this.messageService.setMessage( Message('error', this.config.accountClosed) );
-	} else {
-		this.selected = this.selected !== id ? id : 0;
+	handleData(data) {
+		this.success = data.success;
+		this.loading = false;
+		if (data.success) {
+			this.empty = Boolean(data.empty);
+			if (!data.empty) {
+				this.config.accountList.forEach( el => this[el] = data[el] );
+			}
+		} else {
+			this.messageService.setMessage( Message('error', data.reason, 'router', 'navigate') );
+		}
 	}
-}
+
+	handleSelected(id) {
+		if (id === -1) {
+			this.selected = 0;
+			this.messageService.setMessage( Message('error', this.config.accountClosed) );
+		} else {
+			this.selected = this.selected !== id ? id : 0;
+		}
+	}
 
 	logOut() {
 		this.messageService.setMessage( Message('success', this.config.loggedOut, 'logOut', 'loginService') );

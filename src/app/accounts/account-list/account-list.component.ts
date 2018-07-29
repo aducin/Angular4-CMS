@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { Account } from '../../model/account';
+import { Account, Totals } from '../../model/account';
 import { AccountSummary } from '../../model/accountSummary';
 import { Config } from '../../config';
 
@@ -20,18 +20,7 @@ export class AccountListComponent {
   @Input() automatic: boolean;
   @Input() empty:boolean;
   @Input() loading:boolean;
-  @Input() total = {
-    amount: <number> 0,
-    amountIt: <number> 0,
-    locs: <number> 0,
-    coach: <number> 0,
-    element: <number> 0,
-    accessories: <number> 0,
-    book: <number> 0,
-    car: <number> 0,
-    tax: <number> 0,
-    taxIt: <number> 0
-  };
+  @Input() total: Totals;
   @Output() setSelected = new EventEmitter<number>();
   constructor(private config: Config) { 
     this.loadingMessage = this.config.loading;

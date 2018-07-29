@@ -10,6 +10,7 @@ export class AccountService {
   clear = new EventEmitter();
   dataEmitter = new EventEmitter<any>();
   headers: Headers;
+  loading = new EventEmitter();
   token: string;
 
   constructor(
@@ -74,6 +75,7 @@ export class AccountService {
   }
 
   getCustomAccounts(params: any) {
+    this.loading.emit();
     const url = this.config.url + 'accounts/' + this.token;
     const finalParams = params.reduce((obj, single) => {
       obj[single.key] = single.value;
@@ -105,6 +107,7 @@ export class AccountService {
 
   setInitialState() {
     this.clear.emit();
+    this.loading.emit();
     this.getAccounts();
   }
 }

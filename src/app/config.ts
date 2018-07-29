@@ -32,7 +32,7 @@ export class Config {
 	deliveryStatus: any[] = [ {id: 1, name: 'Do wydruku'}, {id: 2, name: 'Wydrukowany'}, {id: 3, name: 'Zarchiwizowany'} ];
 	deliveryTypes: any[] = [ {id: 1, name: 'Aukcja'}, {id: 2, name: 'Giełda'}];
 	emptyVoucher: string = 'Użytkownik nie posiada zamówień na min. 50zł.';
-	loading: 'Trwa wyszukiwanie - proszę czekać...';
+	loading: string = 'Trwa wyszukiwanie - proszę czekać...';
 	loggedOut: string = 'Zostałeś skutecznie wylogowany!';
 	notANumber: string = 'Podaj liczbę!';
 	orderActions: any[] = [
