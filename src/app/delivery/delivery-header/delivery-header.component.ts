@@ -70,7 +70,7 @@ export class DeliveryHeaderComponent {
 				value: this.parserFormatter.format(this.dateTo)
 			});
 		}
-		this.service.setParams(data);
+		this.service.getCustomDeliveries(data);
     }
 
     open(action) {

@@ -54,9 +54,7 @@ export class AccountsComponent implements OnInit {
 		this.service.loading.subscribe(() => this.loading = true);
 	}
 
- 	ngOnInit() { 
-		 this.service.setInitialState(); 
-	}
+ 	ngOnInit() { this.service.setInitialState() }
 
 	handleData(data) {
 		this.success = data.success;

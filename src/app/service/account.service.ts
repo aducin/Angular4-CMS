@@ -74,7 +74,7 @@ export class AccountService {
     this.dataEmitter.emit(data);
   }
 
-  getCustomAccounts(params: any) {
+  getCustomAccounts(params: {key: string, value: any}[]) {
     this.loading.emit();
     const url = this.config.url + 'accounts/' + this.token;
     const finalParams = params.reduce((obj, single) => {

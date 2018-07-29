@@ -1,21 +1,27 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
 
+import { TokenService } from '../service/token.service';
 import { Config } from '../config';
-
-import { Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class DeliveryService {
   clear = new EventEmitter();
-  getData = new EventEmitter<boolean>();
+  dataEmitter = new EventEmitter<any>();
+  loading = new EventEmitter();
   headers: Headers;
   params: {key: string, value: any}[];
+  token: string;
 
-  constructor(private http:Http, private config: Config) {
+  constructor(
+    private http:Http, 
+    private config: Config,
+    private tokenService: TokenService
+  ) {
     this.headers = new Headers();
     this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
     this.headers.append('Access-Control-Allow-Origin', '*');
+    this.token = this.tokenService.getToken();
   }
 
   addFile(data) {
@@ -30,21 +36,24 @@ export class DeliveryService {
 		.map(res => res.json());
   }
 
-  getCustomDeliveries(token, params) {
-    const url = this.config.url + 'deliveries/' + token;
+  getCustomDeliveries(params: {key: string, value: any}[]) {
+    this.loading.emit();
+    const url = this.config.url + 'deliveries/' + this.token;
     const finalParams = params.reduce((obj, single) => {
       obj[single.key] = single.value;
       return obj;
     }, {});
-    return this.http.get(url, {params: finalParams})
+    let data = this.http.get(url, {params: finalParams})
     .map(res => res.json());
+    this.dataEmitter.emit(data);
   }
 
-  getDeliveries(token) {
-    const url = this.config.url + 'deliveries/' + token;
+  getDeliveries() {
+    this.loading.emit();
+    const url = this.config.url + 'deliveries/' + this.token;
     let data = this.http.get(url)
     .map(res => res.json());
-    return data;
+    this.dataEmitter.emit(data);
   }
 
   setDeliveries(data, method, token) {
@@ -62,11 +71,13 @@ export class DeliveryService {
 
   setInitialState() {
     this.clear.emit();
-    this.getData.emit(true);
+    this.getDeliveries();
   }
 
   setParams(data: {key: string, value: any}[]) {
     this.params = data;
-    this.getData.emit(false);
+    this.loading.emit();
+    this.getDeliveries();
+    //this.getData.emit(false);
   }
 }

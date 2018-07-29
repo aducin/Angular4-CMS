@@ -54,24 +54,13 @@ export class DeliveryComponent implements OnInit {
     this.token = this.tokenService.getToken();
 		this.messageService.display.subscribe((data) => this.messageDisplay(data));
 		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
-		this.service.getData.subscribe((initial) => this.getDeliveries(initial));
+		this.service.dataEmitter
+		.switchMap(observable => observable)
+		.subscribe((data) => this.handleData(data));
+		this.service.loading.subscribe(() => this.loading = true);
   }
 
   ngOnInit() { this.service.setInitialState() }
-
-  getDeliveries(init) {
-    this.loading = true;
-    let modelData;
-    if (init) {
-      modelData = this.service.getDeliveries(this.token);
-    } else {
-      modelData = this.service.getCustomDeliveries(this.token, this.service.params);
-    }
-    modelData.subscribe( data => {
-      this.automatic = init;
-			this.handleData(data);
-		});
-  }
 
   handleData(data) {
     this.success = data.success;
