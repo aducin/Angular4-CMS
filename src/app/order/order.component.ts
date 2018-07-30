@@ -6,7 +6,6 @@ import { CookieService } from 'ngx-cookie';
 import { LoginService } from '../service/login.service';
 import { MessageService } from '../service/message.service';
 import { OrderService } from '../service/order.service';
-import { TokenService } from '../service/token.service';
 
 import { Config } from '../config';
 import { Customer } from '../model/customer';
@@ -26,7 +25,6 @@ export class OrderComponent implements OnInit {
 	children: boolean = false;
 	chooseAction: boolean = true;
 	customer: Customer;
-	mail: any;
 	messageShow: boolean = false;
 	messageType: string;
 	messageValue: string;
@@ -37,7 +35,6 @@ export class OrderComponent implements OnInit {
 	self: string = 'orders';
 	stopAction: boolean = true;
 	stopOrder: boolean = true;
-	token: string;
   	constructor(
 		  private cookieService: CookieService, 
 		  private config: Config, 
@@ -46,17 +43,14 @@ export class OrderComponent implements OnInit {
 		  private route: ActivatedRoute, 
 		  private router: Router, 
 		  private service: OrderService,
-		  private tokenService: TokenService
 	) { 
 		this.actions = this.config.orderActions;
 		this.panels = this.config.orders;
-		this.token = this.tokenService.getToken();
 		this.messageService.display.subscribe((data) => this.messageDisplay(data));
 		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
-		this.service.request.subscribe((data) => {
-			this.mail = data;
-			this.sendMail();
-		});
+		this.service.dataEmitter
+		.switchMap(observable => observable)
+		.subscribe((response) => this.handleMailAction(response));
 	}
 
   	ngOnInit() {}
@@ -90,16 +84,9 @@ export class OrderComponent implements OnInit {
 		}
 	}
 
-	sendMail() {
-		this.service.sendMail(this.mail)
-		.subscribe( data => {
-			if (data.success) {
-				this.mail = null;
-				this.messageService.setMessage( Message('success', data.reason) );
-			} else {
-				this.messageService.setMessage( Message('error', data.reason) );
-			}
-		});
+	handleMailAction(response) {
+		let type = response.success ? 'success' : 'error';
+		this.messageService.setMessage( Message(type, response.reason) );
 	}
 
 	setChildren() {

@@ -7,8 +7,10 @@ import { TokenService } from '../service/token.service';
 
 @Injectable()
 export class OrderService {
-  	headers: Headers;
-	request = new EventEmitter<{db: string, id: number, params: any, token: string}>();
+	dataEmitter = new EventEmitter<any>();
+	headers: Headers;
+	loading = new EventEmitter();
+	loadingFinished = new EventEmitter();
 	token: string;
 
 	constructor(
@@ -23,21 +25,24 @@ export class OrderService {
 		this.token = this.tokenService.getToken();
 	}
 
-	checkVouchers(id, token) {
-		let url = this.config.url + 'customer/old/' + id + '/vouchers/' + token;
+	checkVouchers(id) {
+		this.loading.emit();
+		let url = this.config.url + 'customer/old/' + id + '/vouchers/' + this.token;
 		return this.http.get(url)
-			.map(res => res.json());
+		.map(res => res.json());
 	}
 
-	evenOrder(db, id, token) {
+	evenOrder(db, id) {
+		this.loading.emit();
 		let url = this.config.url + 'orders/' + db + '/' + id + '/even';
-		let data = { tokn: token };
+		let data = { token: this.token };
 		return this.http.put(url, data, this.headers)
-			.map(res => res.json());
+		.map(res => res.json());
 	}
   
-  	getOrder(db, id, token, additional = null) {
-		var url = this.config.url + 'orders/' + db + '/' + id + '/' + token;
+  	getOrder(db, id, additional = null) {
+		this.loading.emit();
+		let url = this.config.url + 'orders/' + db + '/' + id + '/' + this.token;
 		if (additional === 'basic') {
 			url = url + '?basic=true';
 		} else if (additional === 'discount') {
@@ -47,14 +52,11 @@ export class OrderService {
 		.map(res => res.json());
   	}
 
-	setRequest(obj: {db: string, id: number, params: any, token: string}) {
-		this.request.emit(obj);
-	}
-
-	sendMail(data) {
-		var params = new HttpParams();
-		var parameters = data.params;
-		var url = this.config.url + 'orders/' + data.db + '/' + data.id + '/mail/' + data.token;
+	sendMail(obj: {db: string, id: number, params: any, token: string}) {
+		this.loading.emit();
+		let params = new HttpParams();
+		let parameters = obj.params;
+		let url = this.config.url + 'orders/' + obj.db + '/' + obj.id + '/mail/' + this.token;
 		params = params.append("result", parameters.result);
 		params = params.append("action", parameters.action);
 		if (parameters.action === 'deliveryNumber') {
@@ -62,6 +64,8 @@ export class OrderService {
 		} else if (parameters.action === 'voucher') {
 			params = params.append("voucher", parameters.voucher);
 		}
-		return this.httpClient.get<any>(url, {params: params});
+		let data = this.httpClient.get<any>(url, {params: params});
+		this.loadingFinished.emit();
+		this.dataEmitter.emit(data);
 	}
 }

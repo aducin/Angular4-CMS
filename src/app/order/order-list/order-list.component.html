@@ -14,7 +14,7 @@
       </div>
     </div>
     <div *ngIf="!searching && !empty">
-      <div *ngIf="action === 'voucher'">
+      <div *ngIf="action === 'voucher' && customer">
         <div class="col-sm-12 pull-left paddingTop2">
           <h3>Wyniki wyszukiwania kuponów dla Klienta: {{customer.firstname}} {{customer.lastname}}</h3>
         </div>
@@ -93,7 +93,7 @@
         </div>
       </div>
       </div>
-      <div *ngIf="action === 'even'">
+      <div *ngIf="action === 'even' && evenDetails">
         <div class="col-sm-12 pull-left paddingTop2">
           <h3>Wyrównanie ilości produktów - zamówienie nr {{id}} - {{dbName}}</h3>
         </div>
@@ -153,7 +153,7 @@
           </div>
         </div>
       </div>
-      <div *ngIf="action === 'discount' || action ===  'mail' || action === 'order'">
+      <div *ngIf="cardDetails && (action === 'discount' || action ===  'mail' || action === 'order')">
         <div class="col-sm-12 pull-left paddingTop1">
           <h3>Szczegóły zamówienia nr {{orderId}} ({{orderDetails.reference}})</h3>
         </div>
@@ -238,7 +238,7 @@
           </tr>
         </tbody>
       </table>
-          <div *ngIf="action === 'discount'" class="col-sm-12 pull-left paddingTop2">
+          <div *ngIf="action === 'discount' && discount" class="col-sm-12 pull-left paddingTop2">
             <div class="col-sm-3 pull-left"></div>
             <div class="col-sm-6 pull-left">
               <h3 class="textAlignLeft">PODSUMOWANIE:</h3>

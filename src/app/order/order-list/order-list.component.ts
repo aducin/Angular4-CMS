@@ -54,6 +54,8 @@ export class OrderListComponent implements OnInit {
   ) {
     this.serverPath = this.config.serverPath;
     this.token = this.tokenService.getToken();
+    this.service.loading.subscribe(() => this.searching = true);
+    this.service.loadingFinished.subscribe(() => this.searching = false);
   }
 
   ngOnInit() {}
@@ -89,14 +91,13 @@ export class OrderListComponent implements OnInit {
   }
 
   checkVouchers() {
-    this.searching = true;
-    this.service.getOrder(this.db, this.id, this.token, 'basic')
+    this.service.getOrder(this.db, this.id, 'basic')
         .subscribe( data => {
           if (data.success === false) {
             this.handleFailure(data);
           } else {
             this.customerId = data.customer.id;
-            this.service.checkVouchers(this.customerId, this.token)
+            this.service.checkVouchers(this.customerId)
                 .subscribe( data => {
                   if (data.success === false) {
                     this.handleFailure(data);
@@ -115,8 +116,7 @@ export class OrderListComponent implements OnInit {
   }
 
   evenOrder() {
-    this.searching = true;
-    this.service.evenOrder(this.db, this.id, this.token)
+    this.service.evenOrder(this.db, this.id)
         .subscribe( data => {
           this.searching = false;
           if (data[0]) {
@@ -137,10 +137,9 @@ export class OrderListComponent implements OnInit {
   }
 
   searchOrder() {
-    this.searching = true;
     setTimeout(() => {
       if (this.action === 'discount') {
-        var action = this.service.getOrder(this.db, this.id, this.token, 'discount');
+        var action = this.service.getOrder(this.db, this.id, 'discount');
       } else {
         var action = this.service.getOrder(this.db, this.id, this.token);
       }
@@ -200,7 +199,7 @@ export class OrderListComponent implements OnInit {
       params: params,
       token: this.token
     };
-    this.service.setRequest(curObj);
+    this.service.sendMail(curObj);
   }
 
   setNumber() {

@@ -57,7 +57,6 @@ export class AccountsComponent implements OnInit {
  	ngOnInit() { this.service.setInitialState() }
 
 	handleData(data) {
-		this.success = data.success;
 		this.loading = false;
 		if (data.success) {
 			this.empty = Boolean(data.empty);
