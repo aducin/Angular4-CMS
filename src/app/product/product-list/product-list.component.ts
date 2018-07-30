@@ -30,7 +30,6 @@ export class ProductListComponent implements OnInit {
 	@Input() listLength: number;
 	@Input() searchInProgress: boolean;
 	@Output() deleteList = new EventEmitter();
-	@Output() refreshList = new EventEmitter();
   	constructor(
 		  private service: ProductService, 
 		  private productShort: ProductShort, 
@@ -50,18 +49,7 @@ export class ProductListComponent implements OnInit {
   	}
 
   	open(id) {
-  		this.service.getIdSearch(id)
-  		.subscribe( data => {
-  			this.productShort = this.setDetails(data);
-  			const modalRef = this.modalService.open(ModalProductBasic, { windowClass: 'current-modal' });
-  			modalRef.componentInstance.product = this.productShort;
-  			modalRef.result.then((refresh) => {
-  				if (refresh) {
-  					this.refreshList.emit();
-  				}
-			}, (reason) => {
-			});
-  		});
+  		this.service.getIdSearch(id, 'list');
   	}
 
   	setDetails(el) {

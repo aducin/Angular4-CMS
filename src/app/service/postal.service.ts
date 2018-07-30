@@ -1,5 +1,7 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
+
+import { Subject } from 'rxjs/Subject';
 
 import { Config } from '../config';
 import { TokenService } from '../service/token.service';
@@ -7,8 +9,8 @@ import { TokenService } from '../service/token.service';
 @Injectable()
 export class PostalService {
 	headers: Headers;
-	dataEmitter = new EventEmitter<any>();
-	loading = new EventEmitter();
+	dataEmitter = new Subject<any>();
+	loading = new Subject();
 	token: string;
 
 	constructor(
@@ -22,11 +24,11 @@ export class PostalService {
 	}
 	
 	getList() {
-		this.loading.emit();
+		this.loading.next();
 		const url = this.config.url + 'postal/' + this.tokenService.getToken();
 		let data = this.http.get(url)
 		.map(res => res.json());
-		this.dataEmitter.emit(data);
+		this.dataEmitter.next(data);
 	}
 
 	setPostal(data) {

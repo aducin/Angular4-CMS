@@ -1,5 +1,7 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
+
+import { Subject } from 'rxjs/Subject';
 
 import { TokenService } from '../service/token.service';
 import { Config } from '../config';
@@ -7,10 +9,10 @@ import { GetTime } from '../shared/functions';
 
 @Injectable()
 export class AccountService {
-  clear = new EventEmitter();
-  dataEmitter = new EventEmitter<any>();
+  clear = new Subject();
+  dataEmitter = new Subject<any>();
   headers: Headers;
-  loading = new EventEmitter();
+  loading = new Subject();
   token: string;
 
   constructor(
@@ -74,11 +76,11 @@ export class AccountService {
     let url = this.config.url + 'accounts/' + this.token;
     let data = this.http.get(url)
     .map(res => this.handleAmounts(res.json()));
-    this.dataEmitter.emit(data);
+    this.dataEmitter.next(data);
   }
 
   getCustomAccounts(params: {key: string, value: any}[]) {
-    this.loading.emit();
+    this.loading.next();
     const url = this.config.url + 'accounts/' + this.token;
     const finalParams = params.reduce((obj, single) => {
       obj[single.key] = single.value;
@@ -86,7 +88,7 @@ export class AccountService {
     }, {});
     let data = this.http.get(url, {params: finalParams})
     .map(res => this.handleAmounts(res.json()))
-    this.dataEmitter.emit(data);
+    this.dataEmitter.next(data);
   }
 
   modifyAccount(data) {
@@ -109,8 +111,8 @@ export class AccountService {
 	}
 
   setInitialState() {
-    this.clear.emit();
-    this.loading.emit();
+    this.clear.next();
+    this.loading.next();
     this.getAccounts();
   }
 }

@@ -1,33 +1,42 @@
-import { EventEmitter, Injectable } from '@angular/core';
-
+import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
 
 import { Config } from '../config';
 import { Product, NameSearch } from '../model/product';
+import { TokenService } from '../service/token.service';
 
 import { Observable } from 'rxjs/Rx';
+import { Subject } from 'rxjs/Subject';
 import 'rxjs/Rx';
 import 'rxjs/add/observable/forkJoin';
 
 @Injectable()
 export class ProductService {
-	clear = new EventEmitter();
-	editionRefresh = new EventEmitter();
+	clear = new Subject();
+	editionRefresh = new Subject();
 	headers: Headers;
-	idSearch = new EventEmitter<number>();
 	interval: Observable<any>;
-	modifiedRefresh = new EventEmitter();
-	nameSearch = new EventEmitter<NameSearch>();
-	newestOrders = new EventEmitter<NameSearch>();
-	save = new EventEmitter();
+	listEmitter = new Subject<any>();
+	loading = new Subject<string>();
+	modifiedEmitter = new Subject<any>();
+	modifiedSearch = new Subject();
+	nameParams: NameSearch;
+	newestOrders = new Subject<NameSearch>();
+	printingEmitter = new Subject<any>();
+	printingSearch = new Subject();
+	save = new Subject();
+	singleProductEmitter = new Subject<any>();
 	timer: number = 360000;
+	token: string;
 
 	constructor(
 		private http: Http, 
 		private config: Config, 
-		private product: Product
+		private product: Product,
+		private tokenService: TokenService
 	) {
 		this.interval = Observable.interval(this.timer);
+		this.token = this.tokenService.getToken();
 	}
 
 	addPrinting(data) {
@@ -45,22 +54,31 @@ export class ProductService {
 		.map(res => res.json());
 	}
 
-	deleteAdditional(field, id, token) {
-		let url = this.config.url + 'products/' + field + '/' + id + '/' + token;
+	deleteAdditional(field, id) {
+		let url = this.config.url + 'products/' + field + '/' + id + '/' + this.token;
 		return this.http.delete(url)
 		.map(res => res.json());
 	}
 
-	deleteNewest(db, id, token) {
-		let url = this.config.url + 'orders/last/' + db + '/' + id + '/' + token;
+	deleteNewest(db, id) {
+		let url = this.config.url + 'orders/last/' + db + '/' + id + '/' + this.token;
 		return this.http.get(url)
 		.map(res => res.json());
 	}
 
-	getAdditional(field, token) {
-		let url = this.config.url + 'products/' + field + '/' + token ;
-		return this.http.get(url)
-		.map(res => res.json());
+	getAdditional(field) {
+		if (field === 'modified') {
+			this.modifiedSearch.next();
+		} else if (field === 'printing') {
+			this.printingSearch.next();
+		}
+		let url = this.config.url + 'products/' + field + '/' + this.token ;
+		let data = this.http.get(url).map(res => res.json());
+		if (field === 'modified') {
+			this.modifiedEmitter.next(data);
+		} else {
+			this.printingEmitter.next(data);
+		}
 	}
 
 	getBothLists(): Observable<any> {
@@ -77,14 +95,19 @@ export class ProductService {
 		.map(res => res.json());
 	}
 
-	getIdSearch(id: number) {
+	getIdSearch(id: number, origin: string) {
+		if (origin === 'header') {
+			delete(this.nameParams);
+		}
+		this.loading.next('id');
 		let url = this.config.url + 'products/' + id + '?basic=true';
-		return this.http.get(url)
+		let data = this.http.get(url)
 		.map(res => {
 			let obj = this.setPriceAndDiscount(res.json());
 			obj.imgPath = this.config.serverPath + this.config.imageSuffix + obj.id + '-' + obj.image + '-thickbox.jpg';
 			return obj;
 		});
+		this.singleProductEmitter.next(data);
 	}
 
 	getHistory(id: number) {
@@ -93,14 +116,20 @@ export class ProductService {
 		.map(res => res.json());
 	}
 
-	getNameSearch(name: string, category: number, manufactorer: number) {
+	getNameSearch(obj: NameSearch) {
+		this.nameParams = obj;
+		this.loading.next('name');
+		let category = obj.category;
+		let manufactorer = obj.manufactorer;
+		let name = obj.name;
 		let url = this.config.url + 'products?search=' + name + '&category=' + category + '&manufacturer=' + manufactorer;
-		return this.http.get(url)
+		let data = this.http.get(url)
 		.map(res => res.json());
+		this.listEmitter.next(data);
 	}
 
-	getNewestOrders(token: string) {
-		let url = this.config.url + 'orders/last/' + token;
+	getNewestOrders() {
+		let url = this.config.url + 'orders/last/' + this.token;
 		return this.http.get(url)
 		.map(res => res.json());
 	}
@@ -109,16 +138,16 @@ export class ProductService {
 		return this.product;
 	}
 
-	setClear() {
-		this.clear.emit();
+	refreshNameSearch() {
+		this.getNameSearch(this.nameParams);
 	}
 
-	setIdSearch(id: number) {
-    	this.idSearch.emit(id);
-  	}
+	setClear() {
+		this.clear.next();
+	}
 
-	setNameSearch(obj: NameSearch) {
-		this.nameSearch.emit(obj);
+	setEditionRefresh() {
+		this.editionRefresh.next();
 	}
 
 	setPriceAndDiscount(obj) {
@@ -154,12 +183,7 @@ export class ProductService {
 
 	setProductSave(obj) {
 		this.product = obj;
-		this.save.emit();
-	}
-
-	setRefresh() {
-		this.editionRefresh.emit();
-		this.modifiedRefresh.emit();
+		this.save.next();
 	}
 
 	updateProduct(data) {

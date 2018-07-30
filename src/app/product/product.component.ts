@@ -18,7 +18,6 @@ import { NewestOrder } from '../model/newestOrder';
 import { Printing } from '../model/printing';
 import { ProductService } from '../service/product.service';
 import { Standard } from '../model/standard';
-import { TokenService } from '../service/token.service';
 
 @Component({
   	selector: 'app-product',
@@ -75,17 +74,30 @@ export class ProductComponent implements OnInit {
 		private route: ActivatedRoute,
 		private router: Router,
 		private service: ProductService, 
-		private tokenService: TokenService
 	) {
-		this.token = this.tokenService.getToken();
 		this.url = this.config.serverPath;
 		this.urlFiles = this.config.serverPath + 'cms_spa/files/';
 		this.messageService.display.subscribe((data) => this.messageDisplay(data));
 		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
-		this.service.idSearch.subscribe((id: number) => this.idSearch(id));
-		this.service.modifiedRefresh.subscribe(() => this.getModified());
-		this.service.nameSearch.subscribe((dataObj: NameSearch) => this.nameSearch(dataObj));
+		this.service.listEmitter
+		.switchMap(observable => observable)
+		.subscribe((response) => this.nameSearch(response));
+		this.service.loading.subscribe((type) => {
+			this.idSearchInProgress = type === 'id';
+			this.searchInProgress = type === 'name';
+		});
+		this.service.modifiedEmitter
+		.switchMap(observable => observable)
+		.subscribe((response) => { this.handleModified(response) });
+		this.service.modifiedSearch.subscribe( () => this.modifiedSearch = true );
+		this.service.printingEmitter
+		.switchMap(observable => observable)
+		.subscribe((response) => { this.handlePrinting(response) });
+		this.service.printingSearch.subscribe( () => this.printingSearch = true );
 		this.service.save.subscribe(() => this.saveProduct(this.service.getProduct()));
+		this.service.singleProductEmitter
+		.switchMap(observable => observable)
+		.subscribe((response) => this.idSearch(response));
 		this.subscription = this.service.interval.subscribe( () => this.getNewestOrders() );
 	}
 
@@ -96,22 +108,18 @@ export class ProductComponent implements OnInit {
 	ngOnDestroy() { this.unsubscribe() }
 
 	deleteSingle(field, id) {
-		this.service.deleteAdditional(field, id, this.token)
+		this.service.deleteAdditional(field, id)
 		.subscribe( data => {
 			let curType = data.success !== false ? 'success' : 'error';
 			this.messageService.setMessage( Message(curType, data.reason) );
-			if (field === 'modified') {
-				this.getModified();
-			} else if (field === 'printing') {
-				this.getPrinting();
-			}
+			this.service.getAdditional(field);
 		});
 	}
 
 	deleteNewest(event) {
 		delete(this.newestOrderNew);
 		delete(this.newestOrderOld);
-		this.service.deleteNewest(event.db, event.id, this.token)
+		this.service.deleteNewest(event.db, event.id)
 			.subscribe( data => {
 				if (data.success) {
 					this.messageService.setMessage( Message('success', data.reason) );
@@ -141,24 +149,32 @@ export class ProductComponent implements OnInit {
 		this.error = { id: false };
 	}
 
-	getModified() {
-		this.modifiedSearch = true;
-		this.service.getAdditional('modified', this.token)
-		.subscribe( data => {
-			if (data[0] !== undefined) {
-				this.modifiedList = data;
-				this.modifiedEmpty = false;
-			} else {
-				this.modifiedEmpty = true;
-			}
-			this.noModified = false;
-			this.modifiedSearch = false;
-		});
+	handleModified(data) {
+		if (data[0] !== undefined) {
+			this.modifiedList = data;
+			this.modifiedEmpty = false;
+		} else {
+			this.modifiedEmpty = true;
+		}
+		this.noModified = false;
+		this.modifiedSearch = false;
+	}
+
+	handlePrinting(data) {
+		if (data.success && data.empty) {
+			this.printingEmpty = true;
+		} else if (data.success && !data.empty) {
+			this.printingEmpty = false;
+			this.printingList = data.list;
+		}
+		this.deliveryEmpty = data.emptyDelivery;
+		this.deliveryList = data.deliveryList;
+		this.printingSearch = false;
 	}
 
 	getNewestOrders() {
 		this.newestSearch = true;
-		this.service.getNewestOrders(this.token)
+		this.service.getNewestOrders()
 			.subscribe( data => {
 				if (data.success) {
 					this.newestOrders = data.newest;
@@ -173,46 +189,24 @@ export class ProductComponent implements OnInit {
 			});
 	}
 
-	getPrinting() {
-		this.printingSearch = true;
-		this.service.getAdditional('printing', this.token)
-		.subscribe( data => {
-			if (data.success && data.empty) {
-				this.printingEmpty = true;
-			} else if (data.success && !data.empty) {
-				this.printingEmpty = false;
-				this.printingList = data.list;
-			}
-			this.deliveryEmpty = data.emptyDelivery;
-			this.deliveryList = data.deliveryList;
-		});	
-		this.printingSearch = false;
-	}
-
 	hideList() {
 		this.noModified = false;
 		this.service.setClear();
 	}
 
-	idSearch(id) {
-		this.idSearchInProgress = true;
-		setTimeout(() => { 
-			this.service.getIdSearch(id)
-			.subscribe( data => {
-				this.noModified = false;
-				this.product = data;
-				this.productList = undefined;
-				this.idSearchInProgress = false;
-				this.openModal();
-			});	
-		}, 1000);
+	idSearch(response) {
+		this.noModified = false;
+		this.product = response;
+		this.productList = undefined;
+		this.idSearchInProgress = false;
+		this.openModal();
 	}
 
 	initModule() {
 		this.getLists();
-		this.getModified();
 		this.getNewestOrders();
-		this.getPrinting();
+		this.service.getAdditional('modified');
+		this.service.getAdditional('printing');
 	}
 
 	logOut() {
@@ -225,29 +219,30 @@ export class ProductComponent implements OnInit {
 		this.messageValue = data.value;
 	}
 
-	nameSearch(obj) {
-		this.emptySearch = false;
-		this.searchInProgress = true;
-		this.service.getNameSearch(obj.name, obj.category, obj.manufactorer)
-		.subscribe( data => {
-			this.noModified = true;
-			if (data.success === false) {
+	nameSearch(response) {
+		if (response.success === false) {
 				this.emptySearch = true;
-			} else {
-				this.productList = data.map((el) => {
-					el.imgPath = this.url + this.config.imageSuffix + el.id + '-' + el.image + '-thickbox.jpg';
-					return el;
-				});
-				this.listLength = this.productList.length;
-				this.emptySearch = false;
-			}
-			this.searchInProgress = false;
-		});	
+		} else {
+			this.productList = response.map((el) => {
+				el.imgPath = this.url + this.config.imageSuffix + el.id + '-' + el.image + '-thickbox.jpg';
+				return el;
+			});
+			this.listLength = this.productList.length;
+			this.emptySearch = false;
+		}
+		this.noModified = true;
+		this.emptySearch = false;
+		this.searchInProgress = false;
 	}
 
 	openModal() {
 		const modalRef = this.modalService.open(ModalProductBasic, { windowClass: 'current-modal' });
   		modalRef.componentInstance.product = this.product;
+		modalRef.result.then((refresh) => {
+  			if (refresh && this.service.nameParams) {
+  				this.service.refreshNameSearch();
+  			}
+		});
 	}
 
 	postMessageAction(data) {
@@ -274,7 +269,8 @@ export class ProductComponent implements OnInit {
 			let curType = data.success !== false ? 'success' : 'error';
 			window.scrollTo(0, 0);
 			this.messageService.setMessage( Message(curType, data.reason) );
-			this.service.setRefresh();
+			this.service.getAdditional('modified');
+			this.service.setEditionRefresh();
 		});	
 	}
 

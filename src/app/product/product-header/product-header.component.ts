@@ -52,10 +52,12 @@ export class ProductHeaderComponent implements OnInit {
     idSearch() {
 		this.error.id = !this.isInt(this.currentId);
 		if (!this.error.id) {
-			if (this.currentId > 10 && !this.idSearchInProgress) {
-                this.clear(false);
-                this.service.idSearch.emit(this.currentId);
-			}
+            setTimeout(() => {
+                if (this.currentId > 10 && !this.idSearchInProgress) {
+                    this.clear(false);
+                    this.service.getIdSearch(this.currentId, 'header');
+                }
+            }, this.config.searchInterval);
 		}
 	} 
 
@@ -75,7 +77,7 @@ export class ProductHeaderComponent implements OnInit {
         if (this.currentName && this.currentName.length > 3) {
             if (!this.searchInProgress) {
                 this.currentId = null;
-                this.service.setNameSearch({
+                this.service.getNameSearch({
                     name: this.currentName,
                     category: this.currentCategory,
                     manufactorer: this.currentManufactorer

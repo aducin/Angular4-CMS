@@ -1,14 +1,16 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
+
+import { Subject } from 'rxjs/Subject';
 
 import { TokenService } from '../service/token.service';
 import { Config } from '../config';
 
 @Injectable()
 export class DeliveryService {
-  clear = new EventEmitter();
-  dataEmitter = new EventEmitter<any>();
-  loading = new EventEmitter();
+  clear = new Subject();
+  dataEmitter = new Subject<any>();
+  loading = new Subject();
   headers: Headers;
   params: {key: string, value: any}[];
   token: string;
@@ -37,7 +39,7 @@ export class DeliveryService {
   }
 
   getCustomDeliveries(params: {key: string, value: any}[]) {
-    this.loading.emit();
+    this.loading.next();
     const url = this.config.url + 'deliveries/' + this.token;
     const finalParams = params.reduce((obj, single) => {
       obj[single.key] = single.value;
@@ -45,15 +47,15 @@ export class DeliveryService {
     }, {});
     let data = this.http.get(url, {params: finalParams})
     .map(res => res.json());
-    this.dataEmitter.emit(data);
+    this.dataEmitter.next(data);
   }
 
   getDeliveries() {
-    this.loading.emit();
+    this.loading.next();
     const url = this.config.url + 'deliveries/' + this.token;
     let data = this.http.get(url)
     .map(res => res.json());
-    this.dataEmitter.emit(data);
+    this.dataEmitter.next(data);
   }
 
   setDeliveries(data, method, token) {
@@ -70,14 +72,13 @@ export class DeliveryService {
   }
 
   setInitialState() {
-    this.clear.emit();
+    this.clear.next();
     this.getDeliveries();
   }
 
   setParams(data: {key: string, value: any}[]) {
     this.params = data;
-    this.loading.emit();
+    this.loading.next();
     this.getDeliveries();
-    //this.getData.emit(false);
   }
 }

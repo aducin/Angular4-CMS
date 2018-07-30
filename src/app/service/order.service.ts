@@ -1,16 +1,18 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
 import { HttpParams, HttpClient } from '@angular/common/http';
+
+import { Subject } from 'rxjs/Subject';
 
 import { Config } from '../config';
 import { TokenService } from '../service/token.service';
 
 @Injectable()
 export class OrderService {
-	dataEmitter = new EventEmitter<any>();
+	dataEmitter = new Subject<any>();
 	headers: Headers;
-	loading = new EventEmitter();
-	loadingFinished = new EventEmitter();
+	loading = new Subject();
+	loadingFinished = new Subject();
 	token: string;
 
 	constructor(
@@ -26,14 +28,14 @@ export class OrderService {
 	}
 
 	checkVouchers(id) {
-		this.loading.emit();
+		this.loading.next();
 		let url = this.config.url + 'customer/old/' + id + '/vouchers/' + this.token;
 		return this.http.get(url)
 		.map(res => res.json());
 	}
 
 	evenOrder(db, id) {
-		this.loading.emit();
+		this.loading.next();
 		let url = this.config.url + 'orders/' + db + '/' + id + '/even';
 		let data = { token: this.token };
 		return this.http.put(url, data, this.headers)
@@ -41,7 +43,7 @@ export class OrderService {
 	}
   
   	getOrder(db, id, additional = null) {
-		this.loading.emit();
+		this.loading.next();
 		let url = this.config.url + 'orders/' + db + '/' + id + '/' + this.token;
 		if (additional === 'basic') {
 			url = url + '?basic=true';
@@ -53,7 +55,7 @@ export class OrderService {
   	}
 
 	sendMail(obj: {db: string, id: number, params: any, token: string}) {
-		this.loading.emit();
+		this.loading.next();
 		let params = new HttpParams();
 		let parameters = obj.params;
 		let url = this.config.url + 'orders/' + obj.db + '/' + obj.id + '/mail/' + this.token;
@@ -65,7 +67,7 @@ export class OrderService {
 			params = params.append("voucher", parameters.voucher);
 		}
 		let data = this.httpClient.get<any>(url, {params: params});
-		this.loadingFinished.emit();
-		this.dataEmitter.emit(data);
+		this.loadingFinished.next();
+		this.dataEmitter.next(data);
 	}
 }
