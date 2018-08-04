@@ -14,9 +14,8 @@
 				<div class="col-sm-12 col-lg-8 pull-right paddingBottom2">
 					<select 
 						[(ngModel)]="currentCategory" 
-						(change)="namePrepare()" 
 						[disabled]="children || idSearchInProgress || idSearchInProgress || inputDisabled" 
-						class="form-control"
+						class="form-control nameSearch"
 						cursorPointer>
 						<option *ngFor="let single of category" [ngValue]="single.id">{{single.metaTitle}}</option>
 					</select>
@@ -28,9 +27,8 @@
 				<div class="col-sm-12 col-lg-8 pull-right paddingBottom2">
 					<select 
 						[(ngModel)]="currentManufactorer" 
-						(change)="nameSearch()" 
 						[disabled]="children || idSearchInProgress || idSearchInProgress || inputDisabled" 
-						class="form-control"
+						class="form-control nameSearch"
 						cursorPointer> 
 						<option *ngFor="let single of manufactorer" [ngValue]="single.id">{{single.name}}</option>
 					</select>
@@ -41,7 +39,6 @@
 				</div>
 				<div class="col-sm-12 col-lg-8 pull-right paddingBottom2">
 					<input 
-                        (keyup)="namePrepare()" 
                         [(ngModel)]="currentName" 
                         #name="ngModel" 
                         [disabled]="children || idSearchInProgress"
@@ -63,13 +60,12 @@
 				</div>
 				<div class="col-sm-12 col-lg-8 pull-right paddingBottom2">
 					<input 
-                        (keyup)="idSearch()" 
                         [(ngModel)]="currentId" 
                         [disabled]="children || idSearchInProgress"  
-                        class="form-control textAlignCenter" 
+                        class="form-control textAlignCenter idInput" 
+						id="idInput" 
                         placeholder="Podaj numer ID"
-						inputActive 
-                    />
+						inputActive />
 					<div *ngIf="error.id" class="alert alert-danger textAlignCenter marginTop3">Podaj liczbę, Łośku!</div>
 				</div>
 			</div>

@@ -1,6 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { Observable } from 'rxjs/Rx';
+import 'rxjs/Rx';
+
 import { ProductService } from '../../service/product.service';
 import { Category } from '../../model/category';
 import { Product } from '../../model/product';
@@ -20,6 +23,7 @@ export class EditionComponent implements OnInit {
 	error: boolean = false;
 	id: number;
 	inputDisabled: boolean = true;
+	loading: boolean = false;
 	manufactorer: Standard[];
 	photos: boolean = false;
 	saveDisabled: boolean = true;
@@ -52,6 +56,18 @@ export class EditionComponent implements OnInit {
 		this.getData();
 	}
 
+	ngAfterViewInit() {
+		Observable.fromEvent(document.getElementById("saveEdition"), 'click') 
+		//this.product
+	}
+
+	ngDoCheck() {
+		if (this.id !== this.route.snapshot.params.id) {
+			this.id = this.route.snapshot.params.id;
+			this.getData();
+		}
+	}
+
 	categoryHover() {
 		this.cursor = true;
 	}
@@ -61,14 +77,15 @@ export class EditionComponent implements OnInit {
 	}
 
 	getData() {
+		this.loading = true;
 		this.service.getEdition(this.id)
   		.subscribe( data => {
   			if (data.success !== undefined && data.success === false) {
   				this.error = data.reason;
   			} else {
   				this.product = data;
-  				var tagString: string = '';
-  				var counter: number = 0;
+  				let tagString: string = '';
+  				let counter: number = 0;
   				this.product.categoryCount = 0;
   				data.categories.forEach(secondEl => {
   					if (secondEl.checked) {
@@ -88,6 +105,7 @@ export class EditionComponent implements OnInit {
   				this.product.deleteImages = this.product.productUpdated = this.error = this.inputDisabled = false;
   				this.saveDisabled = true;
   			}
+			this.loading = false;
   		});	
 	}
 

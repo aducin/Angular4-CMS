@@ -79,25 +79,13 @@ export class ProductComponent implements OnInit {
 		this.urlFiles = this.config.serverPath + 'cms_spa/files/';
 		this.messageService.display.subscribe((data) => this.messageDisplay(data));
 		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
-		this.service.listEmitter
-		.switchMap(observable => observable)
-		.subscribe((response) => this.nameSearch(response));
+		this.service.listEmitter.subscribe((response) => this.nameSearch(response));
 		this.service.loading.subscribe((type) => {
 			this.idSearchInProgress = type === 'id';
 			this.searchInProgress = type === 'name';
 		});
-		this.service.modifiedEmitter
-		.switchMap(observable => observable)
-		.subscribe((response) => { this.handleModified(response) });
-		this.service.modifiedSearch.subscribe( () => this.modifiedSearch = true );
-		this.service.printingEmitter
-		.switchMap(observable => observable)
-		.subscribe((response) => { this.handlePrinting(response) });
-		this.service.printingSearch.subscribe( () => this.printingSearch = true );
 		this.service.save.subscribe(() => this.saveProduct(this.service.getProduct()));
-		this.service.singleProductEmitter
-		.switchMap(observable => observable)
-		.subscribe((response) => this.idSearch(response));
+		this.service.singleProductEmitter.subscribe((response) => this.idSearch(response));
 		this.subscription = this.service.interval.subscribe( () => this.getNewestOrders() );
 	}
 
@@ -106,15 +94,6 @@ export class ProductComponent implements OnInit {
 	ngDoCheck() { this.setChildren() }
 
 	ngOnDestroy() { this.unsubscribe() }
-
-	deleteSingle(field, id) {
-		this.service.deleteAdditional(field, id)
-		.subscribe( data => {
-			let curType = data.success !== false ? 'success' : 'error';
-			this.messageService.setMessage( Message(curType, data.reason) );
-			this.service.getAdditional(field);
-		});
-	}
 
 	deleteNewest(event) {
 		delete(this.newestOrderNew);
@@ -126,6 +105,30 @@ export class ProductComponent implements OnInit {
 					this.getNewestOrders();
 				}
 			});
+	}
+
+	deleteSingle(field, id) {
+		this.service.deleteAdditional(field, id)
+		.subscribe( data => {
+			let curType = data.success !== false ? 'success' : 'error';
+			this.messageService.setMessage( Message(curType, data.reason) );
+			if (field === 'modified') {
+				this.getModified();
+			} else {
+				this.getPrinting();
+			}
+		});
+	}
+
+	hideList() {
+		this.noModified = false;
+		this.service.setClear();
+	}
+
+	idSearch(response) {
+		this.product = response;
+		this.idSearchInProgress = false;
+		this.openModal();
 	}
 
 	getLists() {
@@ -149,27 +152,19 @@ export class ProductComponent implements OnInit {
 		this.error = { id: false };
 	}
 
-	handleModified(data) {
-		if (data[0] !== undefined) {
-			this.modifiedList = data;
-			this.modifiedEmpty = false;
-		} else {
-			this.modifiedEmpty = true;
-		}
-		this.noModified = false;
-		this.modifiedSearch = false;
-	}
-
-	handlePrinting(data) {
-		if (data.success && data.empty) {
-			this.printingEmpty = true;
-		} else if (data.success && !data.empty) {
-			this.printingEmpty = false;
-			this.printingList = data.list;
-		}
-		this.deliveryEmpty = data.emptyDelivery;
-		this.deliveryList = data.deliveryList;
-		this.printingSearch = false;
+	getModified() {
+		this.modifiedSearch = true;
+		this.service.getModified()
+		.subscribe( data => {
+			if (data[0] !== undefined) {
+				this.modifiedList = data;
+				this.modifiedEmpty = false;
+			} else {
+				this.modifiedEmpty = true;
+			}
+			this.noModified = false;
+			this.modifiedSearch = false;
+		});
 	}
 
 	getNewestOrders() {
@@ -189,24 +184,27 @@ export class ProductComponent implements OnInit {
 			});
 	}
 
-	hideList() {
-		this.noModified = false;
-		this.service.setClear();
-	}
-
-	idSearch(response) {
-		this.noModified = false;
-		this.product = response;
-		this.productList = undefined;
-		this.idSearchInProgress = false;
-		this.openModal();
+	getPrinting() {
+		this.printingSearch = true;
+		let result = this.service.getPrinting()
+		.subscribe(data => {
+			if (data.success && data.empty) {
+				this.printingEmpty = true;
+			} else if (data.success && !data.empty) {
+				this.printingEmpty = false;
+				this.printingList = data.list;
+			}
+			this.deliveryEmpty = data.emptyDelivery;
+			this.deliveryList = data.deliveryList;
+			this.printingSearch = false;
+		});
 	}
 
 	initModule() {
 		this.getLists();
 		this.getNewestOrders();
-		this.service.getAdditional('modified');
-		this.service.getAdditional('printing');
+		this.getModified();
+		this.getPrinting();
 	}
 
 	logOut() {
@@ -220,19 +218,22 @@ export class ProductComponent implements OnInit {
 	}
 
 	nameSearch(response) {
-		if (response.success === false) {
+		this.searchInProgress = true;
+		this.noModified = false;
+		setTimeout(() => {
+			if (response.success === false) {
 				this.emptySearch = true;
-		} else {
-			this.productList = response.map((el) => {
-				el.imgPath = this.url + this.config.imageSuffix + el.id + '-' + el.image + '-thickbox.jpg';
-				return el;
-			});
-			this.listLength = this.productList.length;
-			this.emptySearch = false;
-		}
-		this.noModified = true;
-		this.emptySearch = false;
-		this.searchInProgress = false;
+			} else {
+				this.productList = response.map((el) => {
+					el.imgPath = this.url + this.config.imageSuffix + el.id + '-' + el.image + '-thickbox.jpg';
+					return el;
+				});
+				this.listLength = this.productList.length;
+				this.emptySearch = false;
+			}
+			this.noModified = true;
+			this.searchInProgress = false;
+		}, 0);
 	}
 
 	openModal() {
@@ -240,7 +241,7 @@ export class ProductComponent implements OnInit {
   		modalRef.componentInstance.product = this.product;
 		modalRef.result.then((refresh) => {
   			if (refresh && this.service.nameParams) {
-  				this.service.refreshNameSearch();
+				this.service.getNameSearch(this.service.nameParams).subscribe(data => this.nameSearch(data));
   			}
 		});
 	}
@@ -269,7 +270,7 @@ export class ProductComponent implements OnInit {
 			let curType = data.success !== false ? 'success' : 'error';
 			window.scrollTo(0, 0);
 			this.messageService.setMessage( Message(curType, data.reason) );
-			this.service.getAdditional('modified');
+			this.getModified();
 			this.service.setEditionRefresh();
 		});	
 	}

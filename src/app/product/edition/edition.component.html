@@ -4,10 +4,10 @@
 		<div *ngIf="error">
 			<h2>W bazie nie znaleziono produktu o podanym numerze ID!</h2>
 		</div>
-		<div *ngIf="!error && !product.id">
+		<div *ngIf="loading || (!error && !product.id)">
 			<h2>Ładowanie danych - proszę czekać...</h2>
 		</div>
-		<div *ngIf="!error && product.id">
+		<div *ngIf="!loading && !error && product.id">
 			<div class="paddingBottom20px">
 				<h2><a href="{{url}}{{product.id}}-{{product.linkRewrite}}.html" target="_blank">Pełna edycja produktu ID: {{product.id}}</a></h2>
 			</div>
@@ -182,7 +182,12 @@
 				</div>
 				<div class="col-sm-12 pull-left paddingBottom1">
 					<div class="col-sm-6 col-md-2 pull-right">
-						<button type="button" (click)="save()" [disabled]="saveDisabled || inputDisabled" class="btn btn-primary btn-block">Zapisz</button>
+						<button 
+							type="button" 
+							(click)="save()" 
+							[disabled]="saveDisabled || inputDisabled" 
+							class="btn btn-primary btn-block"
+							id="saveEdition">Zapisz</button>
 					</div>
 					<div class="col-sm-6 col-md-2 pull-right">
 						<button type="button" (click)="goBack()" class="btn btn-danger btn-block">Powrót</button>

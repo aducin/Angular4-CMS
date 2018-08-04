@@ -1,6 +1,10 @@
-import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+
+import { Observable } from 'rxjs/Rx';
+import 'rxjs/add/observable/fromEvent';
+import 'rxjs/add/operator/map';
 
 import { Config } from '../../config';
 import { CheckEmpty } from '../../shared/functions';
@@ -18,6 +22,7 @@ export class DeliveryHeaderComponent {
 	dateTo: any;
     deliveryTypes: any[];
     status: any[];
+	subscription: any;
 
     @Output() openModal = new EventEmitter<string>();
     @Input() loading: boolean;
@@ -30,6 +35,16 @@ export class DeliveryHeaderComponent {
         this.service.clear.subscribe(() => this.clearHeader());
     }
 
+	ngAfterViewInit() {
+		let hook = document.getElementsByClassName("checkDeliveries");
+		let changeStream = Observable.fromEvent(hook, 'change');
+		this.subscription = changeStream.subscribe(e => this.checkDeliveries());
+	}
+
+	ngOnDestroy() {
+		this.subscription.unsubscribe();
+	}
+
     clearHeader() {
         this.setEmpties();
 		this.currentStatus = -1;
@@ -39,31 +54,14 @@ export class DeliveryHeaderComponent {
     }
 
     checkDeliveries() {
-        let data = [];
-		if (this.currentStatus !== -1) {
-			data.push( {
-				key: 'status',
-				value: this.currentStatus
-			});
-		}
-		if (this.currentType !== -1) {
-			data.push( {
-				key: 'type',
-				value: this.currentType
-			});
-		}
-		if (this.dateFrom !== undefined) {
-			data.push({ 
-				key: 'dateFrom',
-				value: this.parserFormatter.format(this.dateFrom)
-			});
-		}
-		if (this.dateTo !== undefined) {
-			data.push({ 
-				key: 'dateTo',
-				value: this.parserFormatter.format(this.dateTo)
-			});
-		}
+        let data = this.config.deliveryHeaders.reduce((array, single) => {
+			let currentName = single.fullName;
+			if (this[currentName] !== undefined && this[currentName] !== -1) {
+				let value = typeof(this[currentName]) === 'number' ? this[currentName] : this.parserFormatter.format(this[currentName]);
+				array.push({ key: single.name, value });
+			}
+			return array;
+		}, []);
 		this.service.getCustomDeliveries(data);
     }
 
@@ -76,7 +74,7 @@ export class DeliveryHeaderComponent {
         if (typeCheck === -1) {
 			this.deliveryTypes.unshift(this.config.chooseAll);
         }
-		var statusCheck = CheckEmpty(this.status);
+		let statusCheck = CheckEmpty(this.status);
 		if (statusCheck === -1) {
 			this.status.unshift(this.config.chooseAll);
 		}

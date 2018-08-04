@@ -12,7 +12,7 @@
                     <h4>Status</h4>
                 </div>
                 <div class="col-sm-12 col-lg-6 pull-right paddingBottom3">
-                    <select [(ngModel)]="currentStatus" (change)="checkDeliveries()" [disabled]="loading" class="form-control"> 
+                    <select [(ngModel)]="currentStatus" [disabled]="loading" class="form-control checkDeliveries"> 
                     <option *ngFor="let single of status" [ngValue]="single.id">{{single.name}}</option>
                     </select>
                 </div>
@@ -21,7 +21,7 @@
                     <h4>Rodzaj przyjęcia</h4>
                 </div>
                 <div class="col-sm-12 col-lg-6 pull-right paddingBottom3">
-                    <select [(ngModel)]="currentType" (change)="checkDeliveries()" [disabled]="loading" class="form-control"> 
+                    <select [(ngModel)]="currentType" [disabled]="loading" class="form-control checkDeliveries"> 
                         <option *ngFor="let single of deliveryTypes" [ngValue]="single.id">{{single.name}}</option>
                     </select>
                 </div>
@@ -32,7 +32,7 @@
                     <div class="col-sm-12 col-lg-6 pull-right">
                         <div class="form-group">
                             <div class="input-group">
-                                <input class="form-control" placeholder="Wciśnij guzik z prawej"
+                                <input class="form-control checkDeliveries" placeholder="Wciśnij guzik z prawej"
                                     name="dp" [(ngModel)]="dateFrom" (ngModelChange)="checkDeliveries()" [readonly]="true" ngbDatepicker #first="ngbDatepicker">
                                 <button class="input-group-addon" (click)="first.toggle()" type="button">
                                     <img src="src/assets/date.png" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>
@@ -47,7 +47,7 @@
                     <div class="col-sm-12 col-lg-6 pull-right paddingBottom2">
                         <div class="form-group">
                             <div class="input-group">
-                                <input class="form-control" placeholder="Wciśnij guzik z prawej"
+                                <input class="form-control checkDeliveries" placeholder="Wciśnij guzik z prawej"
                                     name="dp" [(ngModel)]="dateTo" (ngModelChange)="checkDeliveries()" [readonly]="true" ngbDatepicker #second="ngbDatepicker">
                                 <button class="input-group-addon" (click)="second.toggle()" type="button">
                                     <img src="src/assets/date.png" style="width: 1.2rem; height: 1rem; cursor: pointer;"/>

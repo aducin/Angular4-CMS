@@ -2,6 +2,9 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } fro
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
+import { Observable } from 'rxjs/Rx';
+import 'rxjs/Rx';
+
 import { ProductShort } from '../../model/productShort';
 import { ProductService } from '../../service/product.service';
 import { ModalProductBasic } from '../../modal/productBasic.component';
@@ -23,6 +26,8 @@ import { ModalProductBasic } from '../../modal/productBasic.component';
 	]
 })
 export class ProductListComponent implements OnInit {
+	subscription: any;
+
 	@Input() productList: ProductShort[];
 	@Input() emptySearch: boolean;
 	@Input() url: string;
@@ -36,7 +41,13 @@ export class ProductListComponent implements OnInit {
 		  private modalService: NgbModal
 	) { }
 
-  	ngOnInit() {
+	ngOnInit() {}
+
+	ngAfterViewInit() {
+		this.subscription = Observable.fromEvent(document.getElementsByClassName("quickSearch"), 'click')
+		.flatMap((e: any) => this.service.getIdSearch(e.target.id, 'list'))
+		.subscribe(response => this.service.emitSingleData(response), 
+        (err => console.log(err.message))); 
   	}
 
   	clearList() {

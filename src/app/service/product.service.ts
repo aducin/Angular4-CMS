@@ -22,6 +22,7 @@ export class ProductService {
 	modifiedSearch = new Subject();
 	nameParams: NameSearch;
 	newestOrders = new Subject<NameSearch>();
+	path: string;
 	printingEmitter = new Subject<any>();
 	printingSearch = new Subject();
 	save = new Subject();
@@ -36,6 +37,7 @@ export class ProductService {
 		private tokenService: TokenService
 	) {
 		this.interval = Observable.interval(this.timer);
+		this.path = this.config.url + 'products/';
 		this.token = this.tokenService.getToken();
 	}
 
@@ -66,6 +68,14 @@ export class ProductService {
 		.map(res => res.json());
 	}
 
+	emitListData(data) {
+		this.listEmitter.next(data);
+	}
+
+	emitSingleData(data) {
+		this.singleProductEmitter.next(data);
+	}
+/*
 	getAdditional(field) {
 		if (field === 'modified') {
 			this.modifiedSearch.next();
@@ -80,7 +90,7 @@ export class ProductService {
 			this.printingEmitter.next(data);
 		}
 	}
-
+*/
 	getBothLists(): Observable<any> {
 		let urlFirst = this.config.url + 'categories';
 		let urlSecond = this.config.url + 'manufacturers';
@@ -90,7 +100,7 @@ export class ProductService {
 	}
 
 	getEdition(id: number) {
-		let url = this.config.url + 'products/' + id;
+		let url = this.path + id;
 		return this.http.get(url)
 		.map(res => res.json());
 	}
@@ -100,18 +110,23 @@ export class ProductService {
 			delete(this.nameParams);
 		}
 		this.loading.next('id');
-		let url = this.config.url + 'products/' + id + '?basic=true';
-		let data = this.http.get(url)
+		let url = this.path + id + '?basic=true';
+		return this.http.get(url)
 		.map(res => {
 			let obj = this.setPriceAndDiscount(res.json());
 			obj.imgPath = this.config.serverPath + this.config.imageSuffix + obj.id + '-' + obj.image + '-thickbox.jpg';
 			return obj;
 		});
-		this.singleProductEmitter.next(data);
 	}
 
 	getHistory(id: number) {
-		let url = this.config.url + 'products/' + id + '/history';
+		let url = this.path + id + '/history';
+		return this.http.get(url)
+		.map(res => res.json());
+	}
+
+	getModified() {
+		let url = this.path + 'modified';
 		return this.http.get(url)
 		.map(res => res.json());
 	}
@@ -123,9 +138,8 @@ export class ProductService {
 		let manufactorer = obj.manufactorer;
 		let name = obj.name;
 		let url = this.config.url + 'products?search=' + name + '&category=' + category + '&manufacturer=' + manufactorer;
-		let data = this.http.get(url)
+		return this.http.get(url)
 		.map(res => res.json());
-		this.listEmitter.next(data);
 	}
 
 	getNewestOrders() {
@@ -134,12 +148,14 @@ export class ProductService {
 		.map(res => res.json());
 	}
 
-	getProduct() {
-		return this.product;
+	getPrinting() {
+		let url = this.path + 'printing' + '/' + this.token;
+		return this.http.get(url)
+		.map(res => res.json());
 	}
 
-	refreshNameSearch() {
-		this.getNameSearch(this.nameParams);
+	getProduct() {
+		return this.product;
 	}
 
 	setClear() {

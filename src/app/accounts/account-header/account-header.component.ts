@@ -1,7 +1,11 @@
-import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 
+import { Observable } from 'rxjs/Rx';
+import 'rxjs/add/observable/fromEvent';
+import 'rxjs/add/operator/map';
+	
 import { Config } from '../../config';
 import { CheckEmpty } from '../../shared/functions';
 import { AccountService } from '../../service/account.service';
@@ -11,13 +15,14 @@ import { AccountService } from '../../service/account.service';
 	templateUrl: './account-header.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class AccountHeaderComponent {
+export class AccountHeaderComponent implements OnInit {
     accountState: any[];
 	accountType: any[];
     currentState: number = -1;
 	currentType: number = -1;
     dateFrom: any;
 	dateTo: any;
+	subscription: any;
 
     @Input() loading: boolean;
     @Input() refresh: boolean;
@@ -31,32 +36,25 @@ export class AccountHeaderComponent {
 		this.service.clear.subscribe(() => this.clearHeader());
     }
 
+	ngOnInit() {
+		let hook = document.getElementsByClassName("checkAccounts");
+		let changeStream = Observable.fromEvent(hook, 'change');
+		this.subscription = changeStream.subscribe(e => this.checkAccounts());
+	}
+
+	ngOnDestroy() {
+		this.subscription.unsubscribe();
+	}
+
     checkAccounts() {
-		let data = [];
-		if (this.currentState !== -1) {
-			data.push( {
-				key: 'state',
-				value: this.currentState
-			});
-		}
-		if (this.currentType !== -1) {
-			data.push( {
-				key: 'type',
-				value: this.currentType
-			});
-		}
-		if (this.dateFrom !== undefined) {
-			data.push({ 
-				key: 'dateFrom',
-				value: this.parserFormatter.format(this.dateFrom)
-			});
-		}
-		if (this.dateTo !== undefined) {
-			data.push({ 
-				key: 'dateTo',
-				value: this.parserFormatter.format(this.dateTo)
-			});
-		}
+		let data = this.config.accountHeaders.reduce((array, single) => {
+			let currentName = single.fullName;
+			if (this[currentName] !== undefined && this[currentName] !== -1) {
+				let value = typeof(this[currentName]) === 'number' ? this[currentName] : this.parserFormatter.format(this[currentName]);
+				array.push({ key: single.name, value });
+			}
+			return array;
+		}, []);
 		this.service.getCustomAccounts(data);
 	}
 

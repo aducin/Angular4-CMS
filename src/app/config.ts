@@ -4,6 +4,12 @@ export class Config {
 	serverSuffix: string = 'cms_spa/';
 	imageSuffix: string = 'img/p/';
 	accountClosed: string = 'Ten rachunek został zamknięty - brak możliwości edycji!';
+	accountHeaders: any[] = [
+		{ fullName: 'currentState', name: 'state' },
+		{ fullName: 'currentType', name: 'type' },
+		{ fullName: 'dateFrom', name: 'dateFrom' }, 
+		{ fullName: 'dateTo', name: 'dateTo' },
+	];
 	accountList: string[] = ['amount', 'automatic', 'list', 'totals'];
 	accountState: any[] = [{ id: 1, name: 'Zamknięty'},{ id: 0, name: 'Otwarty'}];
 	accountTitle: string[] = ['Dodaj nowy rachunek', 'Zmodyfikuj istniejący rachunek'];
@@ -28,6 +34,12 @@ export class Config {
 	chooseCategory: any = { id: 0, metaTitle: 'Proszę wybrać'};
 	chooseManufactorer: any = { id: 0, name: 'Proszę wybrać'};
 	condition: any[] = [ {id: 'new', name: 'Nowy'}, {id: 'used', name: 'Używany'}, {id: 'refurbished', name: 'Odnowiony'} ];
+	deliveryHeaders: any[] = [
+		{ fullName: 'currentStatus', name: 'status' },
+		{ fullName: 'currentType', name: 'type' },
+		{ fullName: 'dateFrom', name: 'dateFrom' }, 
+		{ fullName: 'dateTo', name: 'dateTo' },
+	];
 	deliveryTitle: string[] = ['Dodaj nowe przyjęcie', 'Zmodyfikuj przyjęcie towaru'];
 	deliveryStatus: any[] = [ {id: 1, name: 'Do wydruku'}, {id: 2, name: 'Wydrukowany'}, {id: 3, name: 'Zarchiwizowany'} ];
 	deliveryTypes: any[] = [ {id: 1, name: 'Aukcja'}, {id: 2, name: 'Giełda'}];
