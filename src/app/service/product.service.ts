@@ -20,12 +20,12 @@ export class ProductService {
 	loading = new Subject<string>();
 	modifiedEmitter = new Subject<any>();
 	modifiedSearch = new Subject();
+	modify = new Subject();
 	nameParams: NameSearch;
 	newestOrders = new Subject<NameSearch>();
 	path: string;
 	printingEmitter = new Subject<any>();
 	printingSearch = new Subject();
-	save = new Subject();
 	singleProductEmitter = new Subject<any>();
 	timer: number = 360000;
 	token: string;
@@ -166,6 +166,10 @@ export class ProductService {
 		this.editionRefresh.next();
 	}
 
+	setModified() {
+		this.modify.next();
+	}
+
 	setPriceAndDiscount(obj) {
 		obj.priceBlock = obj.discount.new || !obj.discount.old;
 		obj.priceReal = {
@@ -196,12 +200,7 @@ export class ProductService {
 		}
 		return obj;
 	}
-
-	setProductSave(obj) {
-		this.product = obj;
-		this.save.next();
-	}
-
+	
 	updateProduct(data) {
 		this.headers = new Headers();
 		this.headers.append('Content-Type', 'application/x-www-form-urlencoded');

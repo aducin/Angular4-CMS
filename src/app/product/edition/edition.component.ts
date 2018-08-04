@@ -4,10 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs/Rx';
 import 'rxjs/Rx';
 
+import { MessageService } from '../../service/message.service';
 import { ProductService } from '../../service/product.service';
 import { Category } from '../../model/category';
-import { Product } from '../../model/product';
 import { Config } from '../../config';
+import { Message } from '../../shared/functions';
+import { Product } from '../../model/product';
 import { Standard } from '../../model/standard';
 
 @Component({
@@ -25,10 +27,13 @@ export class EditionComponent implements OnInit {
 	inputDisabled: boolean = true;
 	loading: boolean = false;
 	manufactorer: Standard[];
+	observer: any;
 	photos: boolean = false;
 	saveDisabled: boolean = true;
 	url: string;
+
 	constructor(
+		private messageService: MessageService,
 		private service: ProductService, 
 		private route: ActivatedRoute, 
 		private product: Product, 
@@ -56,15 +61,40 @@ export class EditionComponent implements OnInit {
 		this.getData();
 	}
 
-	ngAfterViewInit() {
-		Observable.fromEvent(document.getElementById("saveEdition"), 'click') 
-		//this.product
-	}
-
 	ngDoCheck() {
 		if (this.id !== this.route.snapshot.params.id) {
 			this.id = this.route.snapshot.params.id;
 			this.getData();
+		} else if (!this.loading && !this.error && this.product.id) {
+			if (!this.observer) {
+				this.observer = true;
+				setTimeout(() => {
+					Observable.fromEvent(document.getElementById("saveEdition"), 'click')
+					.flatMap(e => {
+						this.inputDisabled = true;
+						let curObj = {
+							...this.product, 
+							action: 'full', 
+							db: 'both', 
+							productCategories: [],
+							productTags: this.product.tagString,
+							quantity: this.product.quantityBoth,
+						};
+						this.product.categories.forEach(el => {
+							if (el.checked) { curObj.productCategories.push(el.id); }
+						});
+						['categories', 'manufactorers', 'productCategoriesName'].forEach(el => delete(curObj[el]));
+						return Observable.of(curObj);  
+					})
+					.flatMap(obj => this.service.updateProduct(obj))
+					.subscribe( response => {
+						let curType = response.success !== false ? 'success' : 'error';
+						window.scrollTo(0, 0);
+						this.messageService.setMessage( Message(curType, response.reason) );
+						this.service.setModified();
+					});
+				}, 0);
+			}
 		}
 	}
 
@@ -119,11 +149,6 @@ export class EditionComponent implements OnInit {
 			old: this.product.quantityBoth
 		};
 		this.saveDisabled = false;
-	}
-
-	save() {
-		this.inputDisabled = true;
-		this.service.setProductSave(this.product);
 	}
 
 	saveAllow() {

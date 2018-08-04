@@ -2,6 +2,7 @@ export class Product {
 	id: number;
 	active: number;
 	amount: number;
+	categories: any[];
 	category: any[];
 	categoryCount: number;
 	condition: string;

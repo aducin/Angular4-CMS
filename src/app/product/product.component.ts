@@ -84,7 +84,7 @@ export class ProductComponent implements OnInit {
 			this.idSearchInProgress = type === 'id';
 			this.searchInProgress = type === 'name';
 		});
-		this.service.save.subscribe(() => this.saveProduct(this.service.getProduct()));
+		this.service.modify.subscribe((data) => this.getModified());
 		this.service.singleProductEmitter.subscribe((response) => this.idSearch(response));
 		this.subscription = this.service.interval.subscribe( () => this.getNewestOrders() );
 	}
