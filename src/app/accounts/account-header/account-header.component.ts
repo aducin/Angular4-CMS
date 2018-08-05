@@ -36,10 +36,12 @@ export class AccountHeaderComponent implements OnInit {
 		this.service.clear.subscribe(() => this.clearHeader());
     }
 
-	ngOnInit() {
-		let hook = document.getElementsByClassName("checkAccounts");
-		let changeStream = Observable.fromEvent(hook, 'change');
-		this.subscription = changeStream.subscribe(e => this.checkAccounts());
+	ngOnInit() {}
+
+	ngAfterViewInit() {
+		this.subscription = Observable.fromEvent(document.getElementsByClassName("checkAccounts"), 'change')
+		.flatMap(e => this.service.getCustomAccounts(this.setParams()))
+		.subscribe(result => this.service.setResult(result));
 	}
 
 	ngOnDestroy() {
@@ -47,15 +49,8 @@ export class AccountHeaderComponent implements OnInit {
 	}
 
     checkAccounts() {
-		let data = this.config.accountHeaders.reduce((array, single) => {
-			let currentName = single.fullName;
-			if (this[currentName] !== undefined && this[currentName] !== -1) {
-				let value = typeof(this[currentName]) === 'number' ? this[currentName] : this.parserFormatter.format(this[currentName]);
-				array.push({ key: single.name, value });
-			}
-			return array;
-		}, []);
-		this.service.getCustomAccounts(data);
+		this.service.getCustomAccounts(this.setParams())
+		.subscribe((result) => this.service.setResult(result));
 	}
 
 	clearHeader() {
@@ -71,11 +66,11 @@ export class AccountHeaderComponent implements OnInit {
     }
 
     setEmpties() {
-		var stateCheck = CheckEmpty(this.accountState);
+		let stateCheck = CheckEmpty(this.accountState);
 		if (stateCheck === -1) {
 			this.accountState.unshift(this.config.choose);
 		}
-		var typeCheck = CheckEmpty(this.accountType);
+		let typeCheck = CheckEmpty(this.accountType);
 		if (typeCheck === -1) {
 			this.accountType.unshift(this.config.choose);
 		}
@@ -86,5 +81,16 @@ export class AccountHeaderComponent implements OnInit {
         this.accountState.unshift(this.config.chooseAll);
 		this.accountType = [...this.config.accountType];
         this.accountType.unshift(this.config.chooseAll);
+	}
+
+	setParams() {
+		return this.config.accountHeaders.reduce((array, single) => {
+			let currentName = single.fullName;
+			if (this[currentName] !== undefined && this[currentName] !== -1) {
+				let value = typeof(this[currentName]) === 'number' ? this[currentName] : this.parserFormatter.format(this[currentName]);
+				array.push({ key: single.name, value });
+			}
+			return array;
+		}, []);
 	}
 }

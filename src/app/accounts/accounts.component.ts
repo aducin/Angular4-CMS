@@ -48,13 +48,16 @@ export class AccountsComponent implements OnInit {
 	) {
 		this.messageService.display.subscribe((data) => this.messageDisplay(data));
 		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
-		this.service.dataEmitter
-		.switchMap(observable => observable)
-		.subscribe((data) => this.handleData(data));
 		this.service.loading.subscribe(() => this.loading = true);
+		this.service.result.subscribe((data) => this.handleData(data));
 	}
 
- 	ngOnInit() { this.service.setInitialState() }
+ 	ngOnInit() { this.getAccounts() }
+
+	getAccounts() {
+		this.service.getAccounts()
+		.subscribe((result) => this.handleData(result));
+	}
 
 	handleData(data) {
 		this.loading = false;
@@ -125,7 +128,7 @@ export class AccountsComponent implements OnInit {
 		modalRef.componentInstance.data = data;
 		modalRef.result.then((refresh) => {
 			if (refresh) {
-				this.service.setInitialState();
+				this.getAccounts();
 			}
 		}, (reason) => {
 		});

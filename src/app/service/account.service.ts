@@ -10,9 +10,9 @@ import { GetTime } from '../shared/functions';
 @Injectable()
 export class AccountService {
   clear = new Subject();
-  dataEmitter = new Subject<any>();
   headers: Headers;
   loading = new Subject();
+  result = new Subject();
   token: string;
 
   constructor(
@@ -24,6 +24,25 @@ export class AccountService {
     this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
     this.headers.append('Access-Control-Allow-Origin', '*');
     this.token = this.tokenService.getToken();
+  }
+
+  getAccounts() {
+    this.clear.next();
+    this.loading.next();
+    let url = this.config.url + 'accounts/' + this.token;
+    return this.http.get(url)
+    .map(res => this.handleAmounts(res.json()));
+  }
+
+  getCustomAccounts(params: {key: string, value: any}[]) {
+    this.loading.next();
+    const url = this.config.url + 'accounts/' + this.token;
+    const finalParams = params.reduce((obj, single) => {
+      obj[single.key] = single.value;
+      return obj;
+    }, {});
+    return this.http.get(url, {params: finalParams})
+    .map(res => this.handleAmounts(res.json()))
   }
 
   handleAmounts(obj) {
@@ -72,25 +91,6 @@ export class AccountService {
     el.createTimestamp = GetTime(el.createTime);
   }
 
-  getAccounts() {
-    let url = this.config.url + 'accounts/' + this.token;
-    let data = this.http.get(url)
-    .map(res => this.handleAmounts(res.json()));
-    this.dataEmitter.next(data);
-  }
-
-  getCustomAccounts(params: {key: string, value: any}[]) {
-    this.loading.next();
-    const url = this.config.url + 'accounts/' + this.token;
-    const finalParams = params.reduce((obj, single) => {
-      obj[single.key] = single.value;
-      return obj;
-    }, {});
-    let data = this.http.get(url, {params: finalParams})
-    .map(res => this.handleAmounts(res.json()))
-    this.dataEmitter.next(data);
-  }
-
   modifyAccount(data) {
   	let options = new RequestOptions({ headers: this.headers });
 		const url = this.config.url + 'accounts';
@@ -110,9 +110,7 @@ export class AccountService {
   	.map(res => res.json());
 	}
 
-  setInitialState() {
-    this.clear.next();
-    this.loading.next();
-    this.getAccounts();
+  setResult(result) {
+    this.result.next(result);
   }
 }

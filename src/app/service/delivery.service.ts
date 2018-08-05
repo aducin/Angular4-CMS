@@ -13,6 +13,8 @@ export class DeliveryService {
   loading = new Subject();
   headers: Headers;
   params: {key: string, value: any}[];
+  refresh = new Subject();
+  result = new Subject();
   token: string;
 
   constructor(
@@ -45,17 +47,16 @@ export class DeliveryService {
       obj[single.key] = single.value;
       return obj;
     }, {});
-    let data = this.http.get(url, {params: finalParams})
+    return this.http.get(url, {params: finalParams})
     .map(res => res.json());
-    this.dataEmitter.next(data);
   }
 
   getDeliveries() {
+    this.clear.next();
     this.loading.next();
     const url = this.config.url + 'deliveries/' + this.token;
-    let data = this.http.get(url)
+    return this.http.get(url)
     .map(res => res.json());
-    this.dataEmitter.next(data);
   }
 
   setDeliveries(data, method, token) {
@@ -72,13 +73,16 @@ export class DeliveryService {
   }
 
   setInitialState() {
-    this.clear.next();
-    this.getDeliveries();
+    this.refresh.next();
   }
 
   setParams(data: {key: string, value: any}[]) {
     this.params = data;
     this.loading.next();
     this.getDeliveries();
+  }
+
+  setResult(response) {
+    this.result.next(response);
   }
 }

@@ -256,25 +256,6 @@ export class ProductComponent implements OnInit {
 		}
 	}
 
-	saveProduct(obj) {
-		let curObj = {...obj, action: 'full', db: 'both', productCategories: []};
-		curObj.quantity = parseInt(obj.quantityBoth);
-		curObj.productTags = obj.tagString;
-		obj.categories.forEach(el => {
-			if (el.checked) { curObj.productCategories.push(el.id); }
-		});
-		['categories', 'manufactorers', 'productCategoriesName'].forEach(el => delete(curObj[el]));
-		window.scrollTo(0, 0);
-		this.service.updateProduct(curObj)
-		.subscribe( data => {
-			let curType = data.success !== false ? 'success' : 'error';
-			window.scrollTo(0, 0);
-			this.messageService.setMessage( Message(curType, data.reason) );
-			this.getModified();
-			this.service.setEditionRefresh();
-		});	
-	}
-
 	setChildren() {
 		this.children = (this.route.firstChild && this.route.firstChild.snapshot.params['id'] !== undefined);
 	}

@@ -15,7 +15,7 @@ import { DeliveryService } from '../../service/delivery.service';
 	templateUrl: './delivery-header.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class DeliveryHeaderComponent {
+export class DeliveryHeaderComponent implements OnInit {
     currentStatus: number = -1;
     currentType: number = -1;
     dateFrom: any;
@@ -35,10 +35,12 @@ export class DeliveryHeaderComponent {
         this.service.clear.subscribe(() => this.clearHeader());
     }
 
+	ngOnInit() {}
+
 	ngAfterViewInit() {
-		let hook = document.getElementsByClassName("checkDeliveries");
-		let changeStream = Observable.fromEvent(hook, 'change');
-		this.subscription = changeStream.subscribe(e => this.checkDeliveries());
+		this.subscription = Observable.fromEvent(document.getElementsByClassName("checkDeliveries"), 'change')
+		.switchMap(e => this.service.getCustomDeliveries(this.setParams()))
+		.subscribe((result) => this.service.setResult(result));
 	}
 
 	ngOnDestroy() {
@@ -54,15 +56,8 @@ export class DeliveryHeaderComponent {
     }
 
     checkDeliveries() {
-        let data = this.config.deliveryHeaders.reduce((array, single) => {
-			let currentName = single.fullName;
-			if (this[currentName] !== undefined && this[currentName] !== -1) {
-				let value = typeof(this[currentName]) === 'number' ? this[currentName] : this.parserFormatter.format(this[currentName]);
-				array.push({ key: single.name, value });
-			}
-			return array;
-		}, []);
-		this.service.getCustomDeliveries(data);
+		this.service.getCustomDeliveries(this.setParams())
+		.subscribe((result) => this.service.setResult(result));
     }
 
     open(action) {
@@ -85,5 +80,16 @@ export class DeliveryHeaderComponent {
 		this.deliveryTypes.unshift(this.config.chooseAll); 
 		this.status = [...this.config.deliveryStatus];
 		this.status.unshift(this.config.chooseAll);
+	}
+
+	setParams() {
+		return this.config.deliveryHeaders.reduce((array, single) => {
+			let currentName = single.fullName;
+			if (this[currentName] !== undefined && this[currentName] !== -1) {
+				let value = typeof(this[currentName]) === 'number' ? this[currentName] : this.parserFormatter.format(this[currentName]);
+				array.push({ key: single.name, value });
+			}
+			return array;
+		}, []);
 	}
 }

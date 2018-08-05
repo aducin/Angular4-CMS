@@ -54,13 +54,17 @@ export class DeliveryComponent implements OnInit {
     this.token = this.tokenService.getToken();
 		this.messageService.display.subscribe((data) => this.messageDisplay(data));
 		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
-		this.service.dataEmitter
-		.switchMap(observable => observable)
-		.subscribe((data) => this.handleData(data));
 		this.service.loading.subscribe(() => this.loading = true);
+    this.service.refresh.subscribe(() => this.getDeliveries());
+    this.service.result.subscribe((data) => this.handleData(data));
   }
 
-  ngOnInit() { this.service.setInitialState() }
+  ngOnInit() { this.getDeliveries() }
+
+  getDeliveries() {
+    this.service.getDeliveries()
+		.subscribe((result) => this.handleData(result));
+  }
 
   handleData(data) {
     this.success = data.success;
@@ -126,7 +130,7 @@ export class DeliveryComponent implements OnInit {
     modalRef.componentInstance.data = final;
     modalRef.result.then((refresh) => {
 			if (refresh) {
-				this.service.setInitialState();
+				this.getDeliveries();
 			}
 	  }, (reason) => {
     });
