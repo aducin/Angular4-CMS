@@ -4,6 +4,7 @@ import { Http, Headers, RequestOptions } from "@angular/http";
 import { Subject } from 'rxjs/Subject';
 
 import { Config } from '../config';
+import { GetHeaders } from '../shared/getHeaders';
 import { TokenService } from '../service/token.service';
 
 @Injectable()
@@ -18,9 +19,7 @@ export class PostalService {
 		private config: Config,
 		private tokenService: TokenService
 	) {
-		this.headers = new Headers();
-		this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
-		this.headers.append('Access-Control-Allow-Origin', '*');
+		this.headers = GetHeaders();
 	}
 	
 	getList() {

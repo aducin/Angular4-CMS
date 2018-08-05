@@ -5,6 +5,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { TokenService } from '../service/token.service';
 import { Config } from '../config';
+import { GetHeaders } from '../shared/getHeaders';
 
 @Injectable()
 export class DeliveryService {
@@ -22,9 +23,7 @@ export class DeliveryService {
     private config: Config,
     private tokenService: TokenService
   ) {
-    this.headers = new Headers();
-    this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
-    this.headers.append('Access-Control-Allow-Origin', '*');
+    this.headers = GetHeaders();
     this.token = this.tokenService.getToken();
   }
 

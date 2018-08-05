@@ -5,6 +5,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { TokenService } from '../service/token.service';
 import { Config } from '../config';
+import { GetHeaders } from '../shared/getHeaders';
 import { GetTime } from '../shared/functions';
 
 @Injectable()
@@ -20,9 +21,7 @@ export class AccountService {
     private config: Config,
     private tokenService: TokenService
   ) {
-    this.headers = new Headers();
-    this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
-    this.headers.append('Access-Control-Allow-Origin', '*');
+    this.headers = GetHeaders();
     this.token = this.tokenService.getToken();
   }
 
@@ -99,12 +98,13 @@ export class AccountService {
 	}
 
   setAccount(data, method, token) {
+    let result;
   	let options = new RequestOptions({ headers: this.headers });
     const url = this.config.url + 'accounts/' + token;
     if (method === 1) {
-      var result = this.http.post(url, data, this.headers);
+      result = this.http.post(url, data, this.headers);
     } else {
-      var result = this.http.put(url, data, this.headers);
+      result = this.http.put(url, data, this.headers);
     }
     return result
   	.map(res => res.json());

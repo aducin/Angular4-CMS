@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from "@angular/http";
 
 import { Config } from '../config';
+import { GetHeaders } from '../shared/getHeaders';
 import { Product, NameSearch } from '../model/product';
 import { TokenService } from '../service/token.service';
 
@@ -36,6 +37,7 @@ export class ProductService {
 		private product: Product,
 		private tokenService: TokenService
 	) {
+		this.headers = GetHeaders();
 		this.interval = Observable.interval(this.timer);
 		this.path = this.config.url + 'products/';
 		this.token = this.tokenService.getToken();
@@ -202,9 +204,6 @@ export class ProductService {
 	}
 	
 	updateProduct(data) {
-		this.headers = new Headers();
-		this.headers.append('Content-Type', 'application/x-www-form-urlencoded');
-  		this.headers.append('Access-Control-Allow-Origin', '*');
   		let options = new RequestOptions({ headers: this.headers });
 		let url = this.config.url + 'products/' + data.id + '/' + data.attribute.new + '/' + data.attribute.old;
     	return this.http.put(url, data, this.headers)
