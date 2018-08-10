@@ -2,14 +2,14 @@
   <div class="col-sm-12 pull-left"></div>
   <div class="col-sm-12 col-lg-2 pull-left"></div>
   <div class="col-sm-12 col-lg-8 pull-left bgrContent borderRadius10 marginTop2 paddingTop20px">
-    <div *ngIf="newestSearch" class="col-sm-12 pull-left textAlignCenter">
+    <div *ngIf="searching" class="col-sm-12 pull-left textAlignCenter">
       <h3>Proszę czekać - wyszukiwanie nowych zamówień...</h3>
-      <ngx-loading [show]="newestSearch" [config]="{ backdropBorderRadius: '8px'}"></ngx-loading>
+      <ngx-loading [show]="searching" [config]="{ backdropBorderRadius: '8px'}"></ngx-loading>
     </div>
-    <div *ngIf="!newestSearch && listNew === undefined && listOld === undefined" class="col-sm-12 pull-left">
+    <div *ngIf="!searching && listNew === undefined && listOld === undefined" class="col-sm-12 pull-left">
       <h3>Brak nowych zamówień w obu panelach.</h3>
     </div>
-    <div *ngIf="!newestSearch && (listNew !== null || listOld === null)" class="col-sm-12 pull-left paddingBottom20px">
+    <div *ngIf="!searching && (listNew !== null || listOld === null)" class="col-sm-12 pull-left paddingBottom20px">
       <div *ngIf="listNew !== undefined && listNew !== null">
         <div class="paddingBottom10px">
           <h3 *ngIf="listNew.length === 1">Nowe zamówienie (nowy panel):

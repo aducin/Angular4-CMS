@@ -5,17 +5,15 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CookieService, CookieOptions } from 'ngx-cookie';
 import { CookieOptionsArgs } from '../model/cookieOptionArgs';
 
+import { Category } from '../model/category';
+import { Lists } from '../model/lists';
 import { Product, NameSearch } from '../model/product';
 import { ProductShort } from '../model/productShort';
-import { Category } from '../model/category';
 import { Config } from '../config';
 import { LoginService } from '../service/login.service';
 import { Message } from '../shared/functions';
 import { MessageService } from '../service/message.service';
 import { ModalProductBasic } from '../modal/productBasic.component';
-import { Modified } from '../model/modified';
-import { NewestOrder } from '../model/newestOrder';
-import { Printing } from '../model/printing';
 import { ProductService } from '../service/product.service';
 import { Standard } from '../model/standard';
 
@@ -45,17 +43,7 @@ export class ProductComponent implements OnInit {
 	messageShow: boolean = false;
 	messageType: string;
 	messageValue: string;
-	modifiedList: Modified[];
-	modifiedEmpty: boolean;
-	modifiedSearch: boolean = true;
-	newestOrderNew: NewestOrder[];
-	newestOrderOld: NewestOrder[];
-	newestOrders: { new: number, old: number };
-	newestSearch: boolean = false;
 	noModified: boolean = false;
-	printingEmpty: boolean;
-	printingList: Printing[];
-	printingSearch: boolean = false;
 	productList: ProductShort[];
 	searchInProgress: boolean = false;
 	self: string = 'products';
@@ -67,58 +55,33 @@ export class ProductComponent implements OnInit {
 	constructor(
 		private config: Config, 
 		private cookieService: CookieService, 
+		private lists: Lists,
 		private loginService: LoginService, 
 		private messageService: MessageService,
 		private modalService: NgbModal,  
 		private product: Product, 
 		private route: ActivatedRoute,
 		private router: Router,
-		private service: ProductService, 
+		private service: ProductService
 	) {
 		this.url = this.config.serverPath;
 		this.urlFiles = this.config.serverPath + 'cms_spa/files/';
 		this.messageService.display.subscribe((data) => this.messageDisplay(data));
 		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
 		this.service.listEmitter.subscribe((response) => this.nameSearch(response));
+		this.service.lists.subscribe((lists) => this.setLists(lists));
 		this.service.loading.subscribe((type) => {
 			this.idSearchInProgress = type === 'id';
 			this.searchInProgress = type === 'name';
 		});
-		this.service.modify.subscribe((data) => this.getModified());
 		this.service.singleProductEmitter.subscribe((response) => this.idSearch(response));
-		this.subscription = this.service.interval.subscribe( () => this.getNewestOrders() );
 	}
 
-	ngOnInit() { this.initModule() }
+	ngOnInit() { this.lists.getLists() }
 
 	ngDoCheck() { this.setChildren() }
 
 	ngOnDestroy() { this.unsubscribe() }
-
-	deleteNewest(event) {
-		delete(this.newestOrderNew);
-		delete(this.newestOrderOld);
-		this.service.deleteNewest(event.db, event.id)
-			.subscribe( data => {
-				if (data.success) {
-					this.messageService.setMessage( Message('success', data.reason) );
-					this.getNewestOrders();
-				}
-			});
-	}
-
-	deleteSingle(field, id) {
-		this.service.deleteAdditional(field, id)
-		.subscribe( data => {
-			let curType = data.success !== false ? 'success' : 'error';
-			this.messageService.setMessage( Message(curType, data.reason) );
-			if (field === 'modified') {
-				this.getModified();
-			} else {
-				this.getPrinting();
-			}
-		});
-	}
 
 	hideList() {
 		this.noModified = false;
@@ -129,82 +92,6 @@ export class ProductComponent implements OnInit {
 		this.product = response;
 		this.idSearchInProgress = false;
 		this.openModal();
-	}
-
-	getLists() {
-		let cachedCategories = JSON.parse(localStorage.getItem('categories'));
-		let cachedManufactorers = JSON.parse(localStorage.getItem('manufactorers'));
-		if (cachedCategories && cachedCategories[0] && cachedManufactorers && cachedManufactorers[0]) {
-			this.category = cachedCategories;
-			this.manufactorer = cachedManufactorers;
-		} else {
-			this.service.getBothLists()
-			.subscribe( data => {
-				this.category = data[0];
-				this.category.unshift(this.config.chooseCategory);
-				this.manufactorer = data[1];
-				this.manufactorer.unshift(this.config.chooseManufactorer);
-				localStorage.setItem('categories', JSON.stringify(this.category));
-				localStorage.setItem('manufactorers', JSON.stringify(this.manufactorer));
-			});
-		}
-		this.inputDisabled = false;
-		this.error = { id: false };
-	}
-
-	getModified() {
-		this.modifiedSearch = true;
-		this.service.getModified()
-		.subscribe( data => {
-			if (data[0] !== undefined) {
-				this.modifiedList = data;
-				this.modifiedEmpty = false;
-			} else {
-				this.modifiedEmpty = true;
-			}
-			this.noModified = false;
-			this.modifiedSearch = false;
-		});
-	}
-
-	getNewestOrders() {
-		this.newestSearch = true;
-		this.service.getNewestOrders()
-			.subscribe( data => {
-				if (data.success) {
-					this.newestOrders = data.newest;
-					if (data.list.new) {
-						this.newestOrderNew = data.list.new;
-					}
-					if (data.list.old) {
-						this.newestOrderOld = data.list.old;
-					}
-				}
-				this.newestSearch = false;
-			});
-	}
-
-	getPrinting() {
-		this.printingSearch = true;
-		let result = this.service.getPrinting()
-		.subscribe(data => {
-			if (data.success && data.empty) {
-				this.printingEmpty = true;
-			} else if (data.success && !data.empty) {
-				this.printingEmpty = false;
-				this.printingList = data.list;
-			}
-			this.deliveryEmpty = data.emptyDelivery;
-			this.deliveryList = data.deliveryList;
-			this.printingSearch = false;
-		});
-	}
-
-	initModule() {
-		this.getLists();
-		this.getNewestOrders();
-		this.getModified();
-		this.getPrinting();
 	}
 
 	logOut() {
@@ -258,6 +145,13 @@ export class ProductComponent implements OnInit {
 
 	setChildren() {
 		this.children = (this.route.firstChild && this.route.firstChild.snapshot.params['id'] !== undefined);
+	}
+
+	setLists(lists) {
+		this.category = lists.categories;
+		this.manufactorer = lists.manufactorers;
+		this.inputDisabled = false;
+		this.error = { id: false };
 	}
 
 	unsubscribe() {

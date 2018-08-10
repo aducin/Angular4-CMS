@@ -2,14 +2,14 @@
 	<div class="col-sm-12 pull-left"></div>
 	<div class="col-sm-12 col-lg-2 pull-left"></div>
 	<div class="col-sm-12 col-lg-8 pull-left bgrContent borderRadius10 marginTop2 paddingTop20px">
-		<div *ngIf="modifiedSearch" class="col-sm-12 pull-left textAlignCenter">
+		<div *ngIf="searching" class="col-sm-12 pull-left textAlignCenter">
 			<h3>Proszę czekać - wyszukiwanie produktów podmienionych...</h3>
-			<ngx-loading [show]="modifiedSearch" [config]="{ backdropBorderRadius: '8px'}" style="margin-top: -5px;"></ngx-loading>
+			<ngx-loading [show]="searching" [config]="{ backdropBorderRadius: '8px'}" style="margin-top: -5px;"></ngx-loading>
 		</div>
-		<div *ngIf="modifiedEmpty && !modifiedSearch" class="col-sm-12 pull-left paddingBottom20px">
+		<div *ngIf="empty && !searching" class="col-sm-12 pull-left paddingBottom20px">
 			<h3>Obecnie brak produktów zmodyfikowanych.</h3>
 		</div>
-		<div *ngIf="!modifiedEmpty && !modifiedSearch" class="col-sm-12 pull-left paddingBottom20px">
+		<div *ngIf="!empty && !searching" class="col-sm-12 pull-left paddingBottom20px">
 			<div class="paddingBottom10px">
 				<h3>Lista produktów zmodyfikowanych:</h3>
 			</div>
@@ -22,7 +22,7 @@
 					<th class="textAlignCenter">Akcja</th>
 				</thead>
 				<tbody>
-					<tr *ngFor="let item of modified; let i = index" class="textAlignCenter">
+					<tr *ngFor="let item of list; let i = index" class="textAlignCenter">
 						<td><h5 style="margin-top: 8px;">{{i + 1}}.</h5></td>
 						<td><h5 style="margin-top: 8px;">{{item.id}}</h5></td>
 						<td>

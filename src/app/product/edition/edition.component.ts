@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Observable } from 'rxjs/Rx';
@@ -18,6 +18,9 @@ import { Standard } from '../../model/standard';
   styleUrls: ['./edition.component.css']
 })
 export class EditionComponent implements OnInit {
+
+	@ViewChild('dupa') dupsko;
+
 	active: any[];
 	categories: boolean = false;
 	condition: any[];

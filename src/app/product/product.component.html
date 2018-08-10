@@ -27,32 +27,9 @@
 			<router-outlet></router-outlet>
 		</div>
 		<div *ngIf="!children && !noModified">
-			<newest-order
-					(deleteNewest)="deleteNewest($event)"
-					[listNew]="newestOrderNew"
-					[listOld]="newestOrderOld"
-					[newest]="newestOrders"
-					[newestSearch]="newestSearch"
-					[url]="url"
-			></newest-order>
-			<modified
-					(deleteRow)="deleteSingle('modified', $event)"
-					[modified]="modifiedList"
-					[modifiedEmpty]="modifiedEmpty"
-					[modifiedSearch]="modifiedSearch"
-					[url]="url"
-			></modified>
-			<printing
-					(deleteRow)="deleteSingle('printing', $event)"
-					(refresh)="getPrinting()"
-					[deliveryEmpty]="deliveryEmpty"
-					[deliveryList]="deliveryList"
-					[printing]="printingList"
-					[printingEmpty]="printingEmpty"
-					[printingSearch]="printingSearch"
-					[token]="token"
-					[url]="urlFiles"
-			></printing>
+			<newest-order [url]="url"></newest-order>
+			<modified [url]="url"></modified>
+			<printing [token]="token" [url]="urlFiles"></printing>
 		</div>
 		<div *ngIf="!children && noModified">
 			<product-list

@@ -18,6 +18,7 @@ export class ProductService {
 	headers: Headers;
 	interval: Observable<any>;
 	listEmitter = new Subject<any>();
+	lists = new Subject<any>();
 	loading = new Subject<string>();
 	modifiedEmitter = new Subject<any>();
 	modifiedSearch = new Subject();

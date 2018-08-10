@@ -8,6 +8,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CookieModule } from 'ngx-cookie';
 import { Ng4FilesModule } from '../../../node_modules/angular4-files-upload/src/app/ng4-files';
 
+import { Lists } from '../model/lists';
 import { LoginGuard } from '../login.guard';
 import { MessageService } from '../service/message.service';
 import { Product } from '../model/product';
@@ -78,6 +79,7 @@ export const routes: Routes = [
 		NewestOrderComponent
 	],
 	providers: [
+		Lists,
 		LoginComponent,
 		LoginGuard, 
 		Product,

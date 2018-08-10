@@ -1,8 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Printing } from '../../model/printing';
 import { PrintingModal } from '../../modal/printingModal.component';
+import { Message } from '../../shared/functions';
+import { MessageService } from '../../service/message.service';
+import { ProductService } from '../../service/product.service';
 
 import { Ng4FilesConfig, Ng4FilesSelected, Ng4FilesService, Ng4FilesStatus } from '../../../../node_modules/angular4-files-upload/src/app/ng4-files';
 
@@ -12,18 +15,19 @@ import { Ng4FilesConfig, Ng4FilesSelected, Ng4FilesService, Ng4FilesStatus } fro
   styleUrls: ['./printing.component.css']
 })
 export class PrintingComponent implements OnInit {
-  @Input() deliveryEmpty: boolean;
-  @Input() deliveryList: any[];
-  @Input() printing: Printing;
-	@Input() printingEmpty: boolean;
-  @Input() printingSearch: boolean;
+  deliveryEmpty: boolean;
+  deliveryList: any[];
+  empty: boolean = true;
+  list: any[];
+  searching: boolean = true;
   @Input() token: string;
 	@Input() url: string;
-  @Output() deleteRow = new EventEmitter<number>();
-  @Output() refresh = new EventEmitter();
+
   constructor(
+    private messageService: MessageService,
     private modalService: NgbModal,
     private ng4FilesService: Ng4FilesService,
+    private service: ProductService
   ) { }
 
   public selectedFiles;
@@ -36,10 +40,32 @@ export class PrintingComponent implements OnInit {
 
   ngOnInit() {
     this.ng4FilesService.addConfig(this.testConfig);
+    this.getData();
   }
 
   delete(id) {
-  	this.deleteRow.emit(id);
+  	this.service.deleteAdditional('printing', id)
+		.subscribe( data => {
+			let curType = data.success !== false ? 'success' : 'error';
+			this.messageService.setMessage( Message(curType, data.reason) );
+			this.getData();
+		});
+  }
+
+  getData() {
+    this.searching = true;
+    let result = this.service.getPrinting()
+    .subscribe(data => {
+			if (data.success && data.empty) {
+				this.empty = true;
+			} else if (data.success && !data.empty) {
+				this.empty = false;
+				this.list = data.list;
+			}
+			this.deliveryEmpty = data.emptyDelivery;
+			this.deliveryList = data.deliveryList;
+			this.searching = false;
+		});
   }
 
   public filesUpload(selectedFiles: Ng4FilesSelected): void {
@@ -62,7 +88,7 @@ export class PrintingComponent implements OnInit {
     modalRef.componentInstance.data = obj;
     modalRef.result.then((refresh) => {
 			if (refresh) {
-				this.refresh.emit();
+				this.getData();
 			}
 	  }, (reason) => {
 	  });
