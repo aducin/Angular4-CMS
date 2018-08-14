@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { CookieService } from 'ngx-cookie-service';
@@ -13,7 +14,6 @@ import { TokenService } from '../service/token.service';
 })
 export class LoginComponent implements OnInit {
 	cookieToken: any = undefined;
-	disabledButton: boolean = true;
 	disabledFields: boolean = false;
 	loggedIn: boolean = false;
 	loggedError: boolean = false;
@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit {
 	password: string;
 	remember: boolean = false;
 	result: string;
+	timer: number = 2000;
 	token: string;
   	constructor(
 		private cookieService: CookieService, 
@@ -48,38 +49,41 @@ export class LoginComponent implements OnInit {
   		return curAuth;
   	}
 
-  	handleData() {
-  		this.disabledButton = Boolean(this.login === undefined || this.login.length < 4 || this.password === undefined || this.password.length < 4);
-  	}
-
   	logIn() {
-  		let params = {
+		let params = {
 			email: this.login,
 			password: this.password,
-			remember: this.remember,
+			remember: this.remember
 		};
 		this.disabledFields = true;
-  		this.service.logIn(params)
-  		.subscribe( data => {
-  			this.result = data.reason;
-  			this.loggedIn = data.success;
-  			this.loggedError = !data.success;
+		this.service.logIn(params)
+		.subscribe( data => {
+			this.result = data.reason;
+			this.loggedIn = data.success;
+			this.loggedError = !data.success;
   			if (data.success) {
-  				setTimeout(() => { 
+				setTimeout(() => { 
 					localStorage.setItem('angular4Token', data.token);
 					this.cookieService.set( data.token, data.token, 720 );
 					this.tokenService.setNewToken(data.token);
-  					localStorage.setItem('angular4User', JSON.stringify(data.user));
-  					if (this.remember) {
-  						this.cookieService.set( 'angular4Token', data.token, 604800 );
-  					}
-  					this.router.navigate(['../products']);
-  				}, 2000);
+					localStorage.setItem('angular4User', JSON.stringify(data.user));
+					if (this.remember) {
+						this.cookieService.set( 'angular4Token', data.token, 604800 );
+					}
+					this.router.navigate(['../products']);
+				}, this.timer);
   			} else {
-				  this.disabledFields = false;
-			  }
+				this.removeMessage();
+			}
   		});
   	}
+
+	removeMessage() {
+		setTimeout(() => { 
+			this.loggedError = false;
+			this.disabledFields = false;
+		}, this.timer);
+	}
 
   	tokenCheck(token) {
   		this.service.tokenCheck(token) 

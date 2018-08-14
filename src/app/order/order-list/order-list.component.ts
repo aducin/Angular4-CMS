@@ -137,7 +137,7 @@ export class OrderListComponent implements OnInit {
   }
 
   searchOrder() {
-    setTimeout(() => {
+    //setTimeout(() => {
       if (this.action === 'discount') {
         var action = this.service.getOrder(this.db, this.id, 'discount');
       } else {
@@ -170,7 +170,7 @@ export class OrderListComponent implements OnInit {
               }
             }
           });
-    }, 1000);
+    //}, 1000);
   }
 
   numberLength() {

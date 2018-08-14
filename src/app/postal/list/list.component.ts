@@ -13,7 +13,7 @@ export class ListComponent {
 	loadingMessage: string;
 	
 	@Input() loading:boolean;
-	@Input() postalList: Postal;
+	@Input() postalList: Postal[];
 	constructor(private config: Config) { 
 		this.loadingMessage = this.config.loading;
 	}

@@ -11,7 +11,7 @@
           </div>
           <div *ngIf="!empty">
               <div class="col-sm-12 pull-left textAlignCenter paddingBottom20px">
-                  <h3 *ngIf="automatic">Lista przyjęć - ostatnie {{amount}} wyników</h3>
+                  <h3 *ngIf="automatic">Lista przyjęć (ostatnie {{amount}})</h3>
                   <h3 *ngIf="!automatic">Lista przyjęć z wybranego zakresu - {{amount}} {{amountSuffix}}</h3>
               </div>
               <div class="paddingBottom20px">
@@ -69,7 +69,7 @@
                       </thead>
                       <tbody>
                           <tr *ngFor="let item of deliveryList | orderBy: sortBy: sortReverse, let i = index" [class.activeRow]="item.id === selected" (click)="setActive(item.id)">
-                             <td [ngClass]="{'colorAlertDanger': item.toPrint === 1, 'colorAlertSuccess': item.toPrint === 2}" class="textAlignCenter paddingTop20px">{{item.number}}</td>
+                            <td [ngClass]="{'colorAlertDanger': item.toPrint === 1, 'colorAlertSuccess': item.toPrint === 2}" class="textAlignCenter paddingTop20px">{{item.number}}</td>
                             <td [ngClass]="{'colorAlertDanger': item.toPrint === 1, 'colorAlertSuccess': item.toPrint === 2}" class="textAlignCenter paddingTop20px">{{item.name}}</td>
                             <td class="textAlignCenter">{{item.documentDate}}</td>
                             <td class="textAlignCenter">

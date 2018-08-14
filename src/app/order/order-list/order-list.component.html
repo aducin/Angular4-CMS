@@ -155,7 +155,7 @@
       </div>
       <div *ngIf="cardDetails && (action === 'discount' || action ===  'mail' || action === 'order')">
         <div class="col-sm-12 pull-left paddingTop1">
-          <h3>Szczegóły zamówienia nr {{orderId}} ({{orderDetails.reference}})</h3>
+          <h3>Szczegóły zamówienia nr {{id}} ({{orderDetails.reference}})</h3>
         </div>
         <div class="col-sm-12">
         <div class="col-sm-12 pull-left paddingTop1">
@@ -217,21 +217,13 @@
             <th class="col-xs-1">
               <img [src]="item.cover" height="100" width="100" style="border: 1px solid; border-color: #C8C8C8; border-radius: 5px;">
             </th>
-            <th class="col-xs-1 textAlignCenter" style="padding-top: 4.3%;">
-              {{item.productId}}
-            </th>
+            <th class="col-xs-1 textAlignCenter" style="padding-top: 4.3%;">{{item.productId}}</th>
             <th class="col-xs-4 textAlignCennter" style="padding-top: 4.3%;">
               <a href="{{serverPath}}{{item.productId}}-{{item.linkRewrite}}.html" target="_blank">{{item.productName}}</a>
             </th>
-            <th class="col-xs-2 textAlignCenter" style="padding-top: 4.3%;">
-              {{item.quantity.current}}
-            </th>
-            <th class="col-xs-2 textAlignCenter" style="padding-top: 4.2%;">
-              {{item.quantity.toUpdate}}
-            </th>
-            <th class="col-xs-1 textAlignCenter" style="padding-top: 4%;">
-              {{item.productQuantity}}
-            </th>
+            <th class="col-xs-2 textAlignCenter" style="padding-top: 4.3%;">{{item.quantity.current}}</th>
+            <th class="col-xs-2 textAlignCenter" style="padding-top: 4.2%;">{{item.quantity.toUpdate}}</th>
+            <th class="col-xs-1 textAlignCenter" style="padding-top: 4%;">{{item.productQuantity}}</th>
             <th class="col-xs-1" style="padding-top: 3.5%;">
               <button type="button" (click)="setEdition(item.productId)" class="btn btn-primary btn-block">Pełna edycja</button>
             </th>

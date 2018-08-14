@@ -11,8 +11,11 @@ export class ProductShort {
 		old: number,
 	};
 	link_rewrite: string;
+	/*
 	quantity: {
 		new: number,
 		old: number,
 	};
+	*/
+	quantity: number
 }

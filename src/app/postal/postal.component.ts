@@ -18,7 +18,7 @@ import { Message } from '../shared/functions';
   	templateUrl: './postal.component.html',
     styleUrls: ['./postal.component.css'],
     encapsulation: ViewEncapsulation.None,
-    styles: [`
+    styles: [`data
       .current-modal { position: fixed; top: 10% }
       .modal-content { width: 120% }`
     ]
@@ -46,12 +46,12 @@ export class PostalComponent implements OnInit {
 		this.messageService.postAction.subscribe((data) => this.postMessageAction(data));
     this.service.loading.subscribe( () => this.loading = true );
     this.service.dataEmitter
-		.switchMap(observable => observable)
-		.subscribe((data) => this.handleData(data));
-  }
+      .switchMap(observable => observable)
+      .subscribe((data) => this.handleData(data));
+    }
 
   ngOnInit() { this.service.getList() }
-
+/*
   displayMessage(messageType, messageValue, timer, method = null, action = null) {
 		this.messageShow = true;
 		this.messageType = messageType;
@@ -63,7 +63,7 @@ export class PostalComponent implements OnInit {
   			}
 		}, timer);
 	}
-
+*/
   handleData(data) {
     this.loading = false;
     if (data.success) {

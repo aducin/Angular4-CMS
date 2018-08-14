@@ -23,7 +23,6 @@ export class HistoryComponent implements OnInit {
   	getData() {
   		this.service.getHistory(this.id)
   		.subscribe( data => {
-  		console.log(data);
 			if (data.success !== undefined && data.success === false) {
 				if (data.reason === 'no data') {
 				      this.empty = true;
@@ -35,7 +34,6 @@ export class HistoryComponent implements OnInit {
 				this.empty = false;
 				this.error = false;
 			} 
-  			this.list = data;
   		});	
   	}
 
