@@ -15,6 +15,7 @@ import { PostalModule } from './postal/postal.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { DeliveryModule } from './delivery/delivery.module';
 
+import { Labels } from './labels';
 import { LoginGuard } from './login.guard';
 
 import { LoginService } from './service/login.service';
@@ -82,6 +83,7 @@ import { TokenService } from './service/token.service';
   providers: 
   [
     CookieService,
+    Labels,
     LoginGuard, 
     LoginService,
     TokenService

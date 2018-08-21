@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { Account, Totals } from '../../model/account';
+import { IconComponent } from '../../shared/icon.component'; 
 import { AccountSummary } from '../../model/accountSummary';
 import { Config } from '../../config';
+import { Labels } from '../../labels';
 
 @Component({
   selector: 'account-list',
@@ -10,6 +12,8 @@ import { Config } from '../../config';
   styleUrls: ['./account-list.component.css']
 })
 export class AccountListComponent {
+  accountLabel: {};
+  headerList: any[];
   loadingMessage: string;
   selected: number = 0;
   sortBy: string = 'id';
@@ -22,8 +26,9 @@ export class AccountListComponent {
   @Input() loading:boolean;
   @Input() total: Totals;
   @Output() setSelected = new EventEmitter<number>();
-  constructor(private config: Config) { 
-    this.loadingMessage = this.config.loading;
+  constructor(private config: Config, private labels: Labels) { 
+    this.headerList = this.config.accountListHeaders;
+    this.accountLabel = this.labels.account;
   }
 
   reSort(field) {
@@ -37,7 +42,7 @@ export class AccountListComponent {
     let check = this.accountList.findIndex(el => {
       return el.id === id;
     });
-    var closed = false;
+    let closed = false;
     if (check !== -1) {
       closed = this.accountList[check].closed === 1;
     }

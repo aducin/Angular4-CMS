@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { LoadingModule } from 'ngx-loading';
 
 import { HeaderComponent } from './header/header.component';
+import { IconComponent } from './icon.component';
 import { MessageComponent } from './message/message.component';
 
 import { ActiveDirective } from '../directives/active.directive';
@@ -19,6 +20,7 @@ import { PointerDirective } from '../directives/pointer.directive';
   declarations: 
   [
     HeaderComponent,
+    IconComponent,
     MessageComponent,
     ActiveDirective,
     PointerDirective
@@ -26,6 +28,7 @@ import { PointerDirective } from '../directives/pointer.directive';
   exports: 
   [ 
     HeaderComponent,
+    IconComponent,
     LoadingModule,
     MessageComponent,
     ActiveDirective,

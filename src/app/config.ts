@@ -11,6 +11,21 @@ export class Config {
 		{ fullName: 'dateTo', name: 'dateTo' },
 	];
 	accountList: string[] = ['amount', 'automatic', 'list', 'totals'];
+	accountListHeaders: any[] = [
+		{name: 'Klient', value: 'recipient'},
+		{name: 'Adres', value: 'address'},
+		{name: 'Kwota', value: 'amountFloat'},
+		{name: 'Rodzaj', value: 'typeName'},
+		{name: 'Nr dok.', value: 'receipt'},
+		{name: 'Data dok.', value: 'createTimestamp'},
+		{name: 'Data wpłaty', value: 'cashTimestamp'},
+		{name: 'Lok.', value: 'locs'},
+		{name: 'Wagony', value: 'coach'},
+		{name: 'Element', value: 'element'},
+		{name: 'Części', value: 'accessories'},
+		{name: 'Książki', value: 'book'},
+		{name: 'Auta', value: 'car'}
+	];
 	accountState: any[] = [{ id: 1, name: 'Zamknięty'},{ id: 0, name: 'Otwarty'}];
 	accountTitle: string[] = ['Dodaj nowy rachunek', 'Zmodyfikuj istniejący rachunek'];
 	accountType: any[] = [
