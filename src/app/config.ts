@@ -1,3 +1,5 @@
+import HeaderList from './model/headerList';
+
 export class Config {
 	url: string = 'http://modele-ad9bis.pl/cms_spa/web/';
 	serverPath: string = 'http://modele-ad9bis.pl/';
@@ -11,21 +13,23 @@ export class Config {
 		{ fullName: 'dateTo', name: 'dateTo' },
 	];
 	accountList: string[] = ['amount', 'automatic', 'list', 'totals'];
-	accountListHeaders: any[] = [
-		{name: 'Klient', value: 'recipient'},
-		{name: 'Adres', value: 'address'},
-		{name: 'Kwota', value: 'amountFloat'},
-		{name: 'Rodzaj', value: 'typeName'},
-		{name: 'Nr dok.', value: 'receipt'},
-		{name: 'Data dok.', value: 'createTimestamp'},
-		{name: 'Data wpłaty', value: 'cashTimestamp'},
-		{name: 'Lok.', value: 'locs'},
-		{name: 'Wagony', value: 'coach'},
-		{name: 'Element', value: 'element'},
-		{name: 'Części', value: 'accessories'},
-		{name: 'Książki', value: 'book'},
-		{name: 'Auta', value: 'car'}
+	accountListHeaders: HeaderList[] = [
+		{name: 'Lp.', value: '', sortable: false},
+		{name: 'Klient', value: 'recipient', sortable: true},
+		{name: 'Adres', value: 'address', sortable: true},
+		{name: 'Kwota', value: 'amountFloat', sortable: true},
+		{name: 'Rodzaj', value: 'typeName', sortable: true},
+		{name: 'Nr dok.', value: 'receipt', sortable: true},
+		{name: 'Data dok.', value: 'createTimestamp', sortable: true},
+		{name: 'Data wpłaty', value: 'cashTimestamp', sortable: true},
+		{name: 'Lok.', value: 'locs', sortable: true},
+		{name: 'Wagony', value: 'coach', sortable: true},
+		{name: 'Element', value: 'element', sortable: true},
+		{name: 'Części', value: 'accessories', sortable: true},
+		{name: 'Książki', value: 'book', sortable: true},
+		{name: 'Auta', value: 'car', sortable: true}
 	];
+	accountNumbers: string[] = ['locs', 'coach', 'element', 'accessories', 'book', 'car'];
 	accountState: any[] = [{ id: 1, name: 'Zamknięty'},{ id: 0, name: 'Otwarty'}];
 	accountTitle: string[] = ['Dodaj nowy rachunek', 'Zmodyfikuj istniejący rachunek'];
 	accountType: any[] = [
@@ -55,6 +59,22 @@ export class Config {
 		{ fullName: 'dateFrom', name: 'dateFrom' }, 
 		{ fullName: 'dateTo', name: 'dateTo' },
 	];
+	deliveryListHeaders: HeaderList[] = [
+		{name: 'Numer', value: 'number', sortable: true},
+		{name: 'Nazwa', value: 'name', sortable: true},
+		{name: 'Data', value: 'documentDateStamp', sortable: true},
+		{name: 'Przyjęcie (.pdf)', value: '', sortable: false},
+		{name: 'Wpłata (.pdf)', value: '', sortable: false},
+		{name: 'Aukcja (.pdf)', value: '', sortable: false},
+		{name: 'Lok.', value: 'locs', sortable: true},
+		{name: 'Wagony', value: 'coaches', sortable: true},
+		{name: 'Elementy', value: 'elements', sortable: true},
+		{name: 'Części', value: 'accessories', sortable: true},
+		{name: 'Książki', value: 'books', sortable: true},
+		{name: 'Auta', value: 'cars', sortable: true},
+		{name: 'Akcja', value: '', sortable: false}
+	];
+	deliveryNumbers: string[] = ['locs', 'coaches', 'elements', 'accessories', 'books', 'cars'];
 	deliveryTitle: string[] = ['Dodaj nowe przyjęcie', 'Zmodyfikuj przyjęcie towaru'];
 	deliveryStatus: any[] = [ {id: 1, name: 'Do wydruku'}, {id: 2, name: 'Wydrukowany'}, {id: 3, name: 'Zarchiwizowany'} ];
 	deliveryTypes: any[] = [ {id: 1, name: 'Aukcja'}, {id: 2, name: 'Giełda'}];

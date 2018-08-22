@@ -97,6 +97,13 @@ export class AccountService {
     .map(res => res.json());
 	}
 
+  removeNullFromNumbers(list: any[]) {
+    return [...list].map(el => {
+      this.config.accountNumbers.forEach(innerEl => el[innerEl] = el[innerEl] !== null ? el[innerEl] : 0);
+      return el;
+    });
+  }
+
   setAccount(data, method, token) {
     let result;
   	let options = new RequestOptions({ headers: this.headers });
@@ -110,7 +117,5 @@ export class AccountService {
   	.map(res => res.json());
 	}
 
-  setResult(result) {
-    this.result.next(result);
-  }
+  setResult(result) { this.result.next(result)}
 }

@@ -4,6 +4,7 @@ import { Account, Totals } from '../../model/account';
 import { IconComponent } from '../../shared/icon.component'; 
 import { AccountSummary } from '../../model/accountSummary';
 import { Config } from '../../config';
+import HeaderList from '../../model/headerList';
 import { Labels } from '../../labels';
 
 @Component({
@@ -12,8 +13,8 @@ import { Labels } from '../../labels';
   styleUrls: ['./account-list.component.css']
 })
 export class AccountListComponent {
-  accountLabel: {};
-  headerList: any[];
+  headerList: HeaderList[];
+  label: {};
   loadingMessage: string;
   selected: number = 0;
   sortBy: string = 'id';
@@ -28,7 +29,7 @@ export class AccountListComponent {
   @Output() setSelected = new EventEmitter<number>();
   constructor(private config: Config, private labels: Labels) { 
     this.headerList = this.config.accountListHeaders;
-    this.accountLabel = this.labels.account;
+    this.label = this.labels.account;
   }
 
   reSort(field) {

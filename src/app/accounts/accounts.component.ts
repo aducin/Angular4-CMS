@@ -65,6 +65,7 @@ export class AccountsComponent implements OnInit {
 			this.empty = Boolean(data.empty);
 			if (!data.empty) {
 				this.config.accountList.forEach( el => this[el] = data[el] );
+				this.list = this.service.removeNullFromNumbers(data.list);
 			}
 		} else {
 			this.messageService.setMessage( Message('error', data.reason, 'router', 'navigate') );
@@ -130,7 +131,6 @@ export class AccountsComponent implements OnInit {
 			if (refresh) {
 				this.getAccounts();
 			}
-		}, (reason) => {
 		});
 	}
 

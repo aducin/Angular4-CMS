@@ -29,9 +29,7 @@ export class DeliveryService {
 
   addFile(data) {
     let formData: FormData = new FormData();
-		data.file.forEach((el) => {
-			formData.append("file[]", el, el.name);
-		});
+		data.file.forEach((el) => formData.append("file[]", el, el.name));
 		let headers = new Headers();
     let options = new RequestOptions({ headers: headers });
     let url = this.config.url + 'delivery/' + data.documentNumber + '/' + data.id + '/' + data.token;
@@ -58,6 +56,13 @@ export class DeliveryService {
     .map(res => res.json());
   }
 
+  removeNullFromNumbers(list: any[]) {
+    return [...list].map(el => {
+      this.config.deliveryNumbers.forEach(innerEl => el[innerEl] = el[innerEl] !== null ? el[innerEl] : 0);
+      return el;
+    });
+  }
+
   setDeliveries(data, method, token) {
   	let options = new RequestOptions({ headers: this.headers });
     let url = this.config.url + 'delivery/' + token;
@@ -67,13 +72,10 @@ export class DeliveryService {
     } else {
       promise = this.http.put(url, data, this.headers);
     }
-    return promise
-  	.map(res => res.json());
+    return promise.map(res => res.json());
   }
 
-  setInitialState() {
-    this.refresh.next();
-  }
+  setInitialState() { this.refresh.next() }
 
   setParams(data: {key: string, value: any}[]) {
     this.params = data;
@@ -81,7 +83,17 @@ export class DeliveryService {
     this.getDeliveries();
   }
 
-  setResult(response) {
-    this.result.next(response);
+  setResult(response) { this.result.next(response) }
+
+  setSuffix(amount: number) {
+    let amountSuffix;
+    if (amount === 1) {
+      amountSuffix = 'wynik';
+    } else if (amount > 1 && amount < 5) {
+      amountSuffix = 'wyniki';
+    } else {
+      amountSuffix = 'wyników';
+    }
+    return amountSuffix;
   }
 }

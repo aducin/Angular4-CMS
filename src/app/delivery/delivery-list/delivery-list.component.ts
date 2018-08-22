@@ -1,10 +1,13 @@
 import { Component, DoCheck, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { Delivery } from '../../model/delivery';
 import { DeliveryService } from '../../service/delivery.service';
 import { MessageService } from '../../service/message.service';
 
 import { Config } from '../../config';
+import { Delivery } from '../../model/delivery';
+import HeaderList from '../../model/headerList';
+import { IconComponent } from '../../shared/icon.component';
+import { Labels } from '../../labels';
 import { Message } from '../../shared/functions';
 
 import { Ng4FilesConfig, Ng4FilesSelected, Ng4FilesService, Ng4FilesStatus } from '../../../../node_modules/angular4-files-upload/src/app/ng4-files';
@@ -16,6 +19,8 @@ import { Ng4FilesConfig, Ng4FilesSelected, Ng4FilesService, Ng4FilesStatus } fro
 })
 export class DeliveryListComponent implements OnInit {
   amountSuffix: string;
+  headerList: HeaderList[];
+  label: {};
   loadingMessage: string;
   message: string;
   selected: number = 0;
@@ -33,10 +38,13 @@ export class DeliveryListComponent implements OnInit {
   @Output() setSelected = new EventEmitter<number>();
   constructor(
     private config: Config,
+    private labels: Labels,
     private messageService: MessageService,
     private ng4FilesService: Ng4FilesService,
     private service: DeliveryService
   ) { 
+    this.label = this.labels.delivery;
+    this.headerList = this.config.deliveryListHeaders;
     this.loadingMessage = this.config.loading;
     this.url = this.config.serverPath + this.config.serverSuffix;
     this.token = localStorage.getItem('angular4Token');
@@ -50,18 +58,9 @@ export class DeliveryListComponent implements OnInit {
     totalFilesSize: 10120000
   };
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
-  ngDoCheck() {
-    if (this.amount === 1) {
-      this.amountSuffix = 'wynik';
-    } else if (this.amount > 1 && this.amount < 5) {
-      this.amountSuffix = 'wyniki';
-    } else {
-      this.amountSuffix = 'wyników';
-    }
-  }
+  ngDoCheck() { this.amountSuffix = this.service.setSuffix(this.amount)}
 
   public filesUpload(selectedFiles: Ng4FilesSelected, id, documentNumber): void {
     if (selectedFiles.status !== Ng4FilesStatus.STATUS_SUCCESS) {
@@ -69,24 +68,13 @@ export class DeliveryListComponent implements OnInit {
       return;
     }
     this.selectedFiles = Array.from(selectedFiles.files).map(file => file.name);
-    var curLength = this.selectedFiles.length;
-    if (curLength > this.testConfig.maxFilesCount) {
+    if (this.selectedFiles.length > this.testConfig.maxFilesCount) {
       return;
     }
-    let obj = {
-      documentNumber: documentNumber,
-      id: id,
-      file: selectedFiles.files,
-      token: this.token,
-    };
-    this.service.addFile(obj)
+    this.service.addFile({ documentNumber, id, file: selectedFiles.files, token: this.token })
     .subscribe( data => {
       this.message = data.reason;
-			if (data.success) {
-        this.type = 'success';
-      } else {
-        this.type = 'error';
-      }
+			this.type = data.success ? 'success' : 'error';
       this.messageService.setMessage( Message(this.type, this.message) );
       this.service.setInitialState();
 		});

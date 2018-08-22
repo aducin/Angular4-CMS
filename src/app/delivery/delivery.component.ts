@@ -71,7 +71,7 @@ export class DeliveryComponent implements OnInit {
 		this.empty = Boolean(data.empty);
     this.loading = false;
     if (this.success && !this.empty) {
-      this.deliveries = data.list;
+      this.deliveries = this.service.removeNullFromNumbers(data.list);
       this.amount = data.list.length;
     }
   }

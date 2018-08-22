@@ -10,6 +10,20 @@ export class Labels {
         tax3: 'Kwota należnego podatku od modeli wynosi: ',
         tax17: 'Kwota należnego podatku od usł. inf. wynosi: '
     };
+    delivery: {} = {
+        listAutomatic: 'Lista przyjęć - ostatnie ',
+        listCustom: 'Lista przyjęć z wybranego zakresu - ',
+        noFile: 'Brak',
+        noResult: 'Brak dokumentów spełniających określone kryteria',
+        tooltips: {
+            add: 'Dodaj przyjęcie',
+            addAuction: 'Dodaj aukcję',
+            addCash: 'Dodaj wpłatę',
+            change: 'Zmień przyjęcie',
+            changeAuction: 'Zmień aukcję',
+            changeCash: 'Zmień wpłatę'
+        }
+    }
     currency: string = 'zł';
     results: string = ' wyników';
 }

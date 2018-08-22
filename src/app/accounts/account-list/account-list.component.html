@@ -11,20 +11,24 @@
         </div>
         <div *ngIf="!empty && !loading">
             <div class="col-sm-12 pull-left textAlignCenter paddingBottom20px">
-                <h3 *ngIf="automatic">{{ accountLabel.listAutomatic }}{{amount}}{{ labels.results }}</h3>
-                <h3 *ngIf="!automatic">{{ accountLabel.listCustom }}{{amount}}{{ labels.results }}</h3>
+                <h3 *ngIf="automatic">{{ label.listAutomatic }}{{amount}}{{ labels.results }}</h3>
+                <h3 *ngIf="!automatic">{{ label.listCustom }}{{amount}}{{ labels.results }}</h3>
             </div>
             <div class="paddingBottom20px">
                 <table class="table table-bordered table-horizontal">
                     <thead>
-                        <th>Lp.</th>
                         <th 
                             *ngFor="let item of headerList" 
                             (click)="reSort(item.value)" 
                             class="textAlignCenter" 
                             cursorPointer>
                             {{ item.name }}
-                            <sort-icon [name]="item.value" [sortBy]="sortBy" [sortReverse]="sortReverse"></sort-icon>
+                            <sort-icon 
+                                *ngIf="item.sortable" 
+                                [name]="item.value" 
+                                [sortBy]="sortBy" 
+                                [sortReverse]="sortReverse"
+                            ></sort-icon>
                         </th>
                     </thead>
                     <tbody>
@@ -49,12 +53,12 @@
                             <td class="textAlignCenter">{{item.car}}</td>
                         </tr>
                         <tr>
-                            <td *ngIf="total.amount !== 0" colspan="4" class="textAlignCenter">{{ accountLabel.summary }}</td>
+                            <td *ngIf="total.amount !== 0" colspan="4" class="textAlignCenter">{{ label.summary }}</td>
                             <td *ngIf="total.amount !== 0" colspan="1" class="textAlignCenter">{{total.amount | number:'.2-2' }}{{ labels.currency }}</td>
                             <td *ngIf="total.amount !== 0" colspan="3" class="textAlignCenter">
-                                <span *ngIf="total.amountIt !== 0">{{ accountLabel.rate17 }}{{total.amountIt | number:'.2-2' }}{{ labels.currency }}</span>
+                                <span *ngIf="total.amountIt !== 0">{{ label.rate17 }}{{total.amountIt | number:'.2-2' }}{{ labels.currency }}</span>
                             </td>
-                            <td *ngIf="total.amount === 0" colspan="8" class="textAlignCenter">{{ accountLabel.noClosed }}</td>
+                            <td *ngIf="total.amount === 0" colspan="8" class="textAlignCenter">{{ label.noClosed }}</td>
                             <td class="textAlignCenter">{{total.locs}}</td>
                             <td class="textAlignCenter">{{total.coach}}</td>
                             <td class="textAlignCenter">{{total.element}}</td>
@@ -66,10 +70,10 @@
                 </table>
             </div>
             <div *ngIf="total.tax !== 0" class="col-sm-12 pull-left textAlignCenter paddingBottom20px">
-                <h4>{{ accountLabel.tax3 }}{{total.tax | number:'.2-2' }}{{ labels.currency }}</h4>
+                <h4>{{ label.tax3 }}{{total.tax | number:'.2-2' }}{{ labels.currency }}</h4>
             </div>
             <div *ngIf="total.taxIt !== 0" class="col-sm-12 pull-left textAlignCenter paddingBottom20px">
-                <h4>{{ accountLabel.tax17 }}{{total.taxIt | number:'.2-2' }}{{ labels.currency }}</h4>
+                <h4>{{ label.tax17 }}{{total.taxIt | number:'.2-2' }}{{ labels.currency }}</h4>
             </div>
         </div>
     </div>
