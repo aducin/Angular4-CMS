@@ -45,16 +45,8 @@ export class AccountService {
   }
 
   handleAmounts(obj) {
-    let newObj = {
-      ...obj, 
-      list: [],
-      totals: {
-        amount: 0,
-        amountIt: 0,
-        tax: 0,
-        taxIt: 0
-      }
-    };
+    let totals = { amount: 0, amountIt: 0, tax: 0, taxIt: 0 };
+    let newObj = { ...obj, list: [], totals };
     if (obj.list) {
       newObj.list = obj.list.map((el) => {
         el.amountFloat = parseFloat(el.amount);
